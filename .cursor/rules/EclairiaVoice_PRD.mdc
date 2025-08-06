@@ -1,0 +1,80 @@
+
+# PRD : Écran Voice Recording & Sharing – Eclairia Voice
+
+## **Objectif**
+Développer deux écrans connectés pour la fonctionnalité *Voice Sharing* dans l'application Eclairia Voice. Les écrans doivent reproduire fidèlement les designs fournis (captures d'écran jointes : `Home.jpg`, `Record.jpg`), sans ajout ou suppression d'éléments visuels.
+
+---
+
+## **1. Description des Écrans**
+### **1.1. Écran Principal (Home)**
+- **Header**
+  - Titre : `Eclairia Voice`
+  - Temps restant : format `-HH:MM:SS`
+  - Icône cadeau (à gauche)
+  - Icône alerte (à droite)
+- **Section Thème**
+  - Texte : *"Thème : Le Conseil constitutionnel du Cameroun a convoqué Maurice Kamto."*
+  - Sous-titre : *Politique*
+  - Indicateur visiteurs : `5 visiteurs connectés` avec un point vert
+- **Animation**
+  - Cercle central avec visualisation sonore animée
+- **Player**
+  - Titre audio : `Le changement passera par nous`
+  - Bouton play
+  - Indicateur de progression
+  - Temps total : `13:11`
+  - Compteur : `0:24 | 5 ont écouté`
+  - Icône poubelle à droite
+- **Bouton flottant**
+  - Couleur : rose (#FF3366)
+  - Icône partage (network-like)
+
+---
+
+### **1.2. Écran d'Enregistrement (Record)**
+- Affichage en **overlay** après clic sur bouton flottant
+- **Contrôles**
+  - Barre supérieure : 
+    - Icônes undo/redo
+    - Timer : `00:00:03`
+    - Bouton lecture
+    - Bouton pause
+- **Zone d'édition**
+  - Texte : `Lane : 2`
+  - Titre modifiable : `Le changement passera par nous`
+  - Visualisation audio en temps réel
+- **Actions**
+  - Boutons : `Effacer` | `Enregistrer` | Partage (même icône rose)
+
+---
+
+## **2. Règles UI**
+- Respecter les couleurs, polices et positionnements visibles sur les captures
+- Style minimal, fond bleu sombre (#0A1733)
+- Aucun ajout de nouvel élément UI non visible sur les captures
+- Responsive mais prioritaire sur **mobile design**
+
+---
+
+## **3. Interactions**
+- **Bouton flottant** → Affiche l'overlay d'enregistrement
+- **Bouton Enregistrer** → Lance la capture audio
+- **Bouton Partage** → Partage l'audio enregistré
+- **Bouton Effacer** → Réinitialise la visualisation audio
+- **Visualisation audio** → Affichage en temps réel pendant l'enregistrement
+
+---
+
+## **4. Livrables**
+- Code **Vue.js** (ou framework choisi)
+- Composants isolés :
+  - `VoiceHome.vue`
+  - `VoiceRecord.vue`
+- Respect strict du design fourni (pixel perfect)
+
+---
+
+## **Référence**
+- Captures d'écran : `Home.jpg`, `Record.jpg`
+- Ne PAS créer de nouveau design → suivre à 100% les images fournies.

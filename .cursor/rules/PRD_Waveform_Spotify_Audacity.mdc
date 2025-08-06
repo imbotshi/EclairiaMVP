@@ -1,0 +1,126 @@
+# PRD: Composant Waveform Spotify-like pour Application Audacity-like
+
+## 1. CONTEXTE & OBJECTIF
+Développer un composant Vue.js affichant une **visualisation audio en temps réel** (style Spotify) pendant l'enregistrement via le micro. Ce composant sera intégré dans une application similaire à Audacity avec des fonctionnalités avancées d’édition audio.
+
+---
+
+## 2. FONCTIONNALITÉS DU COMPOSANT
+### Obligatoires
+- Capture audio via **MediaDevices.getUserMedia()**.
+- Analyse audio en **temps réel** via **Web Audio API (AnalyserNode)**.
+- Waveform **en barres verticales animées (style Spotify)**.
+- Animation fluide avec **transform: scaleY**.
+- Boutons **Start / Stop** pour contrôler l’enregistrement.
+
+### Optionnelles (Audacity-like)
+- Timeline affichant la durée.
+- Contrôles : Play, Pause, Export.
+- Multi-pistes avec gestion d’édition.
+- Export audio (.mp3, .wav).
+- Zoom sur waveform.
+
+---
+
+## 3. ARCHITECTURE TECHNIQUE
+```
+[Microphone Input]
+      ↓
+[MediaStream API] 
+      ↓
+[AudioContext] → [AnalyserNode]
+      ↓
+[Frequency Data Array] 
+      ↓
+[DOM Elements → CSS Transform: scaleY()]
+```
+
+---
+
+## 4. STRUCTURE VUE.JS
+- **Parent** : `AudioEditor.vue` → gère timeline et multi-pistes.
+- **Child** : `SpotifyWaveform.vue` → visualisation en temps réel.
+- Communication :
+  - **Props** : 
+    - `color` (string, default "#1DB954")
+    - `barCount` (number, default 6)
+    - `theme` ("light" | "dark")
+    - `isRecording` (boolean)
+  - **Events** :
+    - `recordStart`
+    - `recordStop`
+    - `audioSaved`
+
+---
+
+## 5. FLUX FONCTIONNEL
+1. User clique sur **Start** → demande permission micro.
+2. Création **AudioContext** + **AnalyserNode**.
+3. Extraction data FFT → calcul **volume moyen**.
+4. Animation des barres avec interpolation pour fluidité.
+5. Stop → arrête stream + ferme AudioContext.
+
+---
+
+## 6. UX / UI
+- **Style minimaliste Spotify** : 6 barres vertes (#1DB954), espacées, arrondies.
+- **Responsive** : 
+  - Desktop → hauteur 80px.
+  - Mobile → hauteur 50px.
+- **Boutons simples** : Start / Stop.
+- **Transitions fluides** (lerp + transform).
+
+---
+
+## 7. TECHNOLOGIES
+- **Vue 3 + Composition API**.
+- **CSS transforms** pour animation.
+- **Web Audio API** pour analyse.
+- **MediaRecorder API** pour export audio (optionnel).
+
+---
+
+## 8. CONTRAINTES
+- Latence < 100 ms.
+- Compatibilité Chrome, Edge, Safari, Firefox.
+- Support mobile (iOS, Android avec permission).
+
+---
+
+## 9. ROADMAP
+### Phase 1 (MVP)
+- Waveform Spotify-like animé.
+- Start / Stop enregistrement.
+- Animation fluide.
+
+### Phase 2
+- Ajout timeline.
+- Multi-pistes.
+- Export audio.
+
+### Phase 3
+- Effets audio (fade, gain).
+- Undo/Redo.
+- Partage projets.
+
+---
+
+## 10. KPIs
+- FPS: 60 minimum.
+- Latence audio → visuel: < 0,1s.
+- CPU usage: < 20% sur desktop moyen.
+
+---
+
+## 11. CRITÈRES D’ACCEPTATION
+- Composant affiche 6 barres animées pendant enregistrement.
+- Fluidité des animations (aucun lag visible).
+- Responsive et compatible mobile.
+- Start / Stop fonctionnels.
+
+---
+
+## LIVRABLES
+- **Composant Vue.js** : `SpotifyWaveform.vue`
+- **Props configurables** : barCount, color, theme.
+- **Exemple d’intégration** dans `AudioEditor.vue`.

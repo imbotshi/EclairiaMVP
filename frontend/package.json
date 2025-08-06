@@ -1,0 +1,29 @@
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "pinia": "^3.0.3",
+    "three": "^0.178.0",
+    "vue": "^3.5.17",
+    "wavesurfer.js": "^7.10.1"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.52.1",
+    "@vitejs/plugin-vue": "^6.0.0",
+    "autoprefixer": "^10.4.21",
+    "init": "^0.1.2",
+    "install": "^0.13.0",
+    "npm": "^11.5.1",
+    "npx": "^10.2.2",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.11",
+    "vite": "^7.0.4"
+  }
+}

@@ -1,0 +1,96 @@
+# Questions UX Writing - Page d'accueil Eclairia Voice
+
+## **Questions sur l'identité et la clarté du message**
+
+1. **Titre principal** : "Eclairia Voice" - Ce nom évoque-t-il clairement l'idée d'une plateforme de voix/audio ? Devriez-vous ajouter un sous-titre explicatif comme "Partagez vos voix" ou "Vos histoires, vos voix" ?
+Eclairia Voice est le nom choisi pour le mvp
+2. **Temps restant** : "-02:10:08" - Ce temps négatif est-il intentionnel ? Si c'est un compte à rebours, ne devriez-vous pas afficher "Temps restant : 02:10:08" ou "Expire dans : 02:10:08" ?
+Expire dans : 02:10:08
+3. **Topic affiché** : "Design Weekend : Comment switcher d'une interface utilisateur à une page web ?" - Ce contenu est-il dynamique ou statique ? Devriez-vous ajouter un indicateur comme "Sujet du jour" ou "Discussion en cours" ?
+Discussion en cours
+## **Questions sur l'engagement et l'action**
+
+4. **Bouton d'enregistrement** : Le bouton flottant n'a pas de texte explicatif. Devriez-vous ajouter un tooltip "Enregistrer ma voix" ou "Participer à la discussion" ?
+Aucun texte
+5. **Icônes sans contexte** : Les icônes cadeau et alerte n'ont pas de labels. Devriez-vous ajouter des tooltips ou des labels accessibles comme "Soutenir le projet" et "Signaler un problème" ?
+Non 
+6. **Call-to-action principal** : Quel est l'action principale que vous voulez que l'utilisateur fasse ? Enregistrer ? Écouter ? Participer ?
+Écouter
+## **Questions sur la confiance et la transparence**
+
+7. **Visiteurs connectés** : "5 visiteurs connectés" - Devriez-vous être plus spécifique : "5 personnes écoutent en ce moment" ou "5 participants actifs" ?
+5 personnes écoutent en ce moment
+8. **Modal de soutien** : Le texte "Nous sommes constitué d'une équipe..." contient une faute de grammaire. Devriez-vous corriger en "Nous sommes constitués d'une équipe..." ?
+Oui
+9. **Prix en XAF** : "5000 xaf" - Devriez-vous être plus explicite : "5000 FCFA" ou "5 000 FCFA" avec le formatage approprié ?
+5 000 FCFA
+## **Questions sur l'expérience utilisateur**
+
+10. **État vide** : Que se passe-t-il quand il n'y a pas d'audio en cours ? Devriez-vous afficher un message comme "Aucune discussion en cours" ou "Soyez le premier à partager" ?
+Soyez le premier à partager
+11. **Feedback utilisateur** : Comment l'utilisateur sait-il que son enregistrement a été reçu ? Devriez-vous ajouter des messages de confirmation ?
+Oui
+12. **Navigation** : L'utilisateur comprend-il qu'il peut cliquer sur les icônes du header ? Devriez-vous ajouter des micro-interactions ou des hints visuels ?
+Oui
+## **Questions sur l'accessibilité et l'inclusion**
+
+13. **Langue** : Votre application est en français. Devriez-vous prévoir des traductions pour d'autres langues africaines ?
+Oui
+14. **Accessibilité** : Avez-vous prévu des alternatives textuelles pour les icônes SVG pour les utilisateurs malvoyants ?
+Non
+15. **Contexte culturel** : Le terme "Eclairia" est-il explicite pour votre audience cible ? Devriez-vous ajouter une explication de l'origine du nom ?
+Non
+## **Questions sur la cohérence**
+
+16. **Ton de voix** : Votre application utilise un ton formel ("Nous sommes constitué..."). Devriez-vous adopter un ton plus familier et inclusif ?
+Oui
+17. **Terminologie** : Utilisez-vous des termes cohérents ? "Visiteurs" vs "Participants" vs "Utilisateurs" ?
+Utilisateurs
+18. **Messages d'erreur** : Avez-vous prévu des messages d'erreur clairs et constructifs pour les cas d'échec ?
+Non
+## **Questions sur la personnalisation et l'engagement**
+
+19. **Gamification** : Devriez-vous ajouter des éléments de gamification comme "Points de participation" ou "Badges de contributeur" ?
+Non
+20. **Notifications** : Comment informez-vous l'utilisateur des nouvelles discussions ou réponses ? Devriez-vous ajouter des notifications push ?
+Non
+21. **Progression** : L'utilisateur comprend-il sa progression dans l'application ? Devriez-vous ajouter un indicateur de niveau ou de participation ?
+Non
+## **Questions sur la modération et la sécurité**
+
+22. **Guidelines** : Avez-vous des règles de communauté claires ? Devriez-vous les afficher dans une section "À propos" ou "Règles" ?
+Pas encore je vais fournir des règles de communauté après cette phase.
+23. **Signalement** : Le processus de signalement est-il suffisamment clair ? Devriez-vous ajouter des exemples de ce qui constitue un contenu inapproprié ?
+Oui
+24. **Confirmation** : Après un signalement, confirmez-vous à l'utilisateur que son rapport a été reçu ?
+Oui
+## **Questions sur la performance et la fiabilité**
+
+25. **États de chargement** : Avez-vous des messages de chargement appropriés ? "Enregistrement en cours..." vs "Traitement de votre voix..."
+Enregistrement en cours...
+26. **Connexion** : Que se passe-t-il si l'utilisateur perd sa connexion pendant un enregistrement ? Devriez-vous ajouter un message de sauvegarde automatique ?
+Rien    
+27. **Limites** : Y a-t-il des limites de temps ou de taille pour les enregistrements ? Devriez-vous les communiquer clairement ?
+Non
+## **Questions sur l'internationalisation**
+
+28. **Devises** : Pour les utilisateurs hors zone XAF, devriez-vous afficher des équivalents en euros ou dollars ?
+Oui
+29. **Fuseaux horaires** : Le temps restant est-il adapté au fuseau horaire de l'utilisateur ?
+Non. Le temps restant est reinitialisé tous les jours
+30. **Contenu local** : Devriez-vous adapter le contenu par défaut selon la région de l'utilisateur ?
+Non
+31. **Langue** : Votre application est en français. Devriez-vous prévoir des traductions pour d'autres langues africaines ?
+Oui
+32. **Accessibilité** : Avez-vous prévu des alternatives textuelles pour les icônes SVG pour les utilisateurs malvoyants ?
+Non
+33. **Contexte culturel** : Le terme "Eclairia" est-il explicite pour votre audience cible ? Devriez-vous ajouter une explication de l'origine du nom ?
+Eclairia est le nom de la plateforme. Eclair pour eclairer et IA pour intelligence africaine
+
+
+
+
+
+
+
+

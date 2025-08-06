@@ -1,0 +1,112 @@
+# Cursor AI Command – PRD Dictaphone Intelligent
+
+## OBJECTIF
+
+Implémenter la logique d'un dictaphone interactif avec enregistrement audio, lecture synchronisée, visualisation audio dynamique et boutons fonctionnels, en respectant **strictement** le design fourni.
+
+---
+
+## EXIGENCES GÉNÉRALES
+
+1. Ne modifier **aucun élément du design UI existant** (couleurs, positions, espacements).
+2. Implémenter la logique fonctionnelle telle que décrite dans ce document.
+3. Ajouter des logs dans la console pour **chaque étape critique** :
+
+   * `console.log("Recording started")`
+   * `console.log("Recording paused")`
+   * `console.log("Playback started")`
+   * etc.
+
+---
+
+## ARCHITECTURE TECHNIQUE
+
+* **Framework** : Vue.js ou React (selon projet).
+* **API Audio** : MediaRecorder API + Web Audio API pour analyser et afficher la visualisation audio.
+* **Visualisation audio** : Utiliser `<canvas>` pour afficher les barres audio en temps réel.
+* **Formats supportés** : `.mp3` ou `.wav`.
+* **Performance** : La visualisation audio doit être fluide sans latence.
+
+---
+
+## ÉTATS ET COMPORTEMENTS
+
+### 1. **Idle (initial)**
+
+* Timer = `00:00`
+* Visualisation audio vide
+* Bouton `Enregistrer` actif
+* Bouton `Effacer` inactif
+* Bouton `Lecture` masqué/inactif
+
+### 2. **Recording**
+
+* Bouton `Enregistrer` → devient `Pause`
+* Bouton `Effacer` actif
+* Timer en progression
+* Visualisation audio animée en temps réel (barres selon micro)
+* Log : `console.log("Recording started")`
+
+### 3. **Paused Recording**
+
+* Bouton `Pause` → devient `Reprendre`
+* Visualisation audio figée
+* Timer figé
+* Log : `console.log("Recording paused")`
+
+### 4. **Playback**
+
+* Bouton `Lecture` actif
+* Bouton vitesse `-` et `+` actifs (plage : 0.5x → 2x)
+* Visualisation audio défile avec le curseur **synchronisé** avec l'audio
+* Log : `console.log("Playback started")`
+
+### 5. **Effacer**
+
+* Réinitialise tout : Timer = `00:00`, visualisation audio vide, bouton Lecture inactif
+* Log : `console.log("Audio deleted")`
+
+---
+
+## LOGIQUE DES BOUTONS
+
+* **Enregistrer** : démarre l'enregistrement → devient `Pause`
+* **Pause** : stoppe temporairement l'enregistrement → devient `Reprendre`
+* **Reprendre** : reprend l'enregistrement → redevient `Pause`
+* **Lecture** : lit l'audio enregistré
+* **Effacer** : supprime l'audio et remet à zéro
+
+---
+
+## VISUALISATION AUDIO
+
+* Pendant enregistrement : mise à jour dynamique avec barres audio du micro
+* Pendant lecture : curseur animé proportionnellement à la durée audio
+* Vitesse ajustée selon le contrôle `-` et `+`
+
+---
+
+## CONTRÔLES DE VITESSE
+
+* `-` : réduit la vitesse (min 0.5x)
+* `+` : augmente la vitesse (max 2x)
+* Affichage de la vitesse actuelle (`1x`, `0.5x`, `1.5x`, etc.)
+
+---
+
+## CRITÈRES D'ACCEPTATION
+
+* UI **inchangée**
+* Visualisation audio et timer synchronisés
+* Lecture fluide à différentes vitesses
+* Boutons avec états logiques corrects
+* Aucun crash ou action incohérente (ex : lecture sans audio)
+
+---
+
+### RÈGLES IMPORTANTES POUR CURSOR AI :
+
+* **NE PAS générer un design alternatif**
+* **NE PAS supprimer ou déplacer des éléments UI existants**
+* Implémenter uniquement la logique décrite ci-dessus
+* Ajouter `console.log()` à chaque action critique

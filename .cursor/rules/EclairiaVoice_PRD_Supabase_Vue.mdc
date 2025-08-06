@@ -1,0 +1,160 @@
+
+# PRD.mdc – Projet Eclairia Voice
+> Objectif : Développer une application anonyme de partage et d'écoute de notes vocales sans authentification.
+
+---
+
+## 1. CONTEXTE
+Eclairia Voice est une PWA (Progressive Web App) qui permet :
+- D'enregistrer une note vocale (30-60 secondes max)
+- De l'uploader anonymement sur un serveur
+- De proposer une écoute aléatoire d'audios anonymes
+- De signaler un contenu inapproprié
+- Sans authentification, sans tracking personnel
+
+---
+
+## 2. ARCHITECTURE TECHNIQUE
+
+### 2.1 FRONTEND
+- **Framework** : Vue.js 3 (Composition API)
+- **UI Library** : TailwindCSS
+- **Audio API** : Web Audio API
+- **Composants principaux** :
+    1. **SplashScreen.vue** : Écran d'intro (Logo + Animation)
+    2. **Home.vue** : Écoute aléatoire
+        - Animation sphère (CSS/Canvas)
+        - Affichage du thème, catégorie, visiteurs connectés
+        - Boutons : `Signaler`, `Next`, `Soutenir`
+    3. **Record.vue** : Enregistrement
+        - Timer + Bouton Start/Stop
+        - Affichage visualisation audio en temps réel
+        - Actions : `Effacer`, `Enregistrer`, `Uploader`
+
+**Interactions principales** :
+- Clic sur `Enregistrer` → Start audio capture
+- Clic sur `Stop` → Génère un fichier `.mp3` compressé
+- Upload → API Backend
+- Clic sur `Écouter` → API renvoie un audio random → Audio Player le lit
+
+---
+
+### 2.2 BACKEND
+- **Technologie** : Node.js (Express) + Supabase (PostgreSQL + Storage)
+- **Fonctions principales** :
+    - Upload fichier audio dans Supabase Storage
+    - Stockage URL et métadonnées dans Supabase Database
+    - Lecture audio aléatoire
+    - Signalement
+
+**Endpoints API** :
+- `POST /api/upload`
+    - Payload : `audio (multipart)`, `theme`, `category`
+    - Response : `{ status: "success", audio_url: "...", id: "uuid" }`
+- `GET /api/random`
+    - Response : `{ id, audio_url, theme, category, connected_users }`
+- `POST /api/report/:id`
+    - Payload : `{ reason }`
+    - Response : `{ status: "reported" }`
+
+---
+
+### 2.3 BASE DE DONNÉES
+- **Type** : Supabase PostgreSQL
+- **Table : audios**
+    {
+      "id": "uuid",
+      "audio_url": "https://storage.supabase.io/.../file.mp3",
+      "theme": "string",
+      "category": "string",
+      "created_at": "timestamp",
+      "reports": 0
+    }
+
+---
+
+## 3. UX FLOW
+Splash → Home (Écoute) → Next / Signaler
+             ↓
+           Upload (Enregistrement)
+
+---
+
+## 4. DÉPLOIEMENT
+- **Frontend** : Vercel (Vue.js PWA)
+- **Backend** : Render
+- **DB** : Supabase (PostgreSQL + Storage)
+
+---
+
+## 5. SÉQUENCE POUR CURSOR AI (Avec Vue.js + Supabase)
+
+### Étape 1 : Créer le projet Vue.js avec Vite et TailwindCSS
+```bash
+npm create vite@latest frontend --template vue
+cd frontend
+npm install tailwindcss @supabase/supabase-js
+npx tailwindcss init
+```
+Configurer Tailwind + créer les composants :
+- `components/SplashScreen.vue`
+- `components/Home.vue`
+- `components/Record.vue`
+
+### Étape 2 : Ajouter Web Audio API
+- Implémenter enregistrement avec `MediaRecorder`
+- Limiter la durée à 60s
+- Générer Blob + convertir en MP3
+
+### Étape 3 : Intégrer Supabase (Storage + Database)
+- Créer un projet Supabase
+- Configurer `.env` :
+    ```
+    VITE_SUPABASE_URL=https://vcmrrpfbjlbnivsnqkuh.supabase.co
+    VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjbXJycGZiamxibml2c25xa3VoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMzODEyNDgsImV4cCI6MjA2ODk1NzI0OH0.ZLPGebvg4qTHUmIwzgTrWQ6Tu_o9F7DMuNvSzMes5JE
+    ```
+- Installer le client Supabase :
+    ```javascript
+    import { createClient } from '@supabase/supabase-js';
+    const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY);
+    ```
+- Fonction Upload :
+    ```javascript
+    async function uploadAudio(file) {
+      const { data, error } = await supabase.storage.from('audios').upload(`voice_${Date.now()}.mp3`, file);
+      if (error) throw error;
+      const publicURL = supabase.storage.from('audios').getPublicUrl(data.path);
+      return publicURL;
+    }
+    ```
+- Sauvegarde metadata dans table `audios` :
+    ```javascript
+    await supabase.from('audios').insert({ audio_url: publicURL, theme, category });
+    ```
+
+### Étape 4 : Lecture aléatoire
+- Récupérer un enregistrement aléatoire avec `select().order('random()').limit(1)`
+
+### Étape 5 : Signalement
+- `update reports = reports + 1` sur l'ID
+
+### Étape 6 : Déployer
+- Frontend → Vercel
+- Supabase → déjà hébergé
+- Backend léger → Render (si besoin logique supplémentaire)
+
+---
+
+## 6. TESTS
+- Enregistrement audio → OK
+- Upload vers Supabase → OK
+- Lecture aléatoire → OK
+- Signalement → OK
+
+---
+
+## 7. AMÉLIORATIONS FUTURES
+- Like/dislike
+- Filtrage par catégorie
+- Playlist personnalisée
+- Modération automatique (IA)
