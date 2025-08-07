@@ -1,8 +1,5 @@
 <template>
   <div class="record-bottom-sheet" :class="{ 'is-open': isOpen }">
-    <audio ref="backgroundMusic" loop class="hidden">
-      <source src="/playlist/Backson.m4a" type="audio/mp4">
-    </audio>
     <div class="sheet-backdrop" @click="closeModal"></div>
 
     <div class="sheet-content">
@@ -155,40 +152,6 @@ import WaveSurfer from 'wavesurfer.js'
 import RecordPlugin from 'wavesurfer.js/dist/plugins/record.esm.js'
 
 // Props
-// Musique de fond
-const backgroundMusic = ref(null)
-
-onMounted(async () => {
-  if (backgroundMusic.value) {
-    // Définir le volume avant de jouer
-    backgroundMusic.value.volume = 0.2
-    
-    try {
-      // Attendre que l'audio soit chargé
-      await backgroundMusic.value.load()
-      // Jouer la musique
-      const playPromise = backgroundMusic.value.play()
-      if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          console.warn('Lecture automatique empêchée:', error)
-          // Ajouter un gestionnaire de clic pour démarrer la lecture
-          document.addEventListener('click', () => {
-            backgroundMusic.value.play()
-          }, { once: true })
-        })
-      }
-    } catch (error) {
-      console.error('Erreur de chargement audio:', error)
-    }
-  }
-})
-
-onUnmounted(() => {
-  if (backgroundMusic.value) {
-    backgroundMusic.value.pause()
-    backgroundMusic.value.currentTime = 0
-  }
-})
 
 const props = defineProps({
   isOpen: Boolean

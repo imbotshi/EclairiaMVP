@@ -1,0 +1,207 @@
+# Guide de transformation d'Eclairia en WebRadio Interactive
+
+## Architecture Requise
+
+### 1. Serveur de Streaming Audio
+- **Icecast2** ou **Shoutcast** pour le streaming audio en direct
+- Configuration serveur :
+  - Bande passante dédiée
+  - Support de multiples flux simultanés
+  - Capacité de gestion des métadonnées
+
+### 2. Base de Données (Déjà en place avec Supabase)
+Tables nécessaires :
+```sql
+-- Émissions planifiées
+CREATE TABLE broadcasts (
+  id UUID PRIMARY KEY,
+  title VARCHAR(255),
+  description TEXT,
+  scheduled_time TIMESTAMP,
+  duration INTEGER,
+  status VARCHAR(50)
+);
+
+-- Enregistrements soumis par les utilisateurs
+CREATE TABLE user_recordings (
+  id UUID PRIMARY KEY,
+  user_id UUID,
+  audio_url TEXT,
+  title VARCHAR(255),
+  description TEXT,
+  status VARCHAR(50),
+  submitted_at TIMESTAMP,
+  moderated_at TIMESTAMP,
+  moderator_id UUID
+);
+
+-- File d'attente de diffusion
+CREATE TABLE broadcast_queue (
+  id UUID PRIMARY KEY,
+  recording_id UUID,
+  scheduled_time TIMESTAMP,
+  priority INTEGER,
+  status VARCHAR(50)
+);
+```
+
+### 3. Fonctionnalités Principales à Implémenter
+
+#### Interface Administrateur
+1. Dashboard de modération :
+   - Vue des enregistrements soumis
+   - Outils de modération (accepter/rejeter)
+   - Planification des émissions
+   - Gestion de la file d'attente
+
+2. Studio de diffusion en direct :
+   - Interface de streaming en direct
+   - Mixage des sources audio
+   - Contrôle du volume et des effets
+   - Visualisation des auditeurs connectés
+
+#### Interface Utilisateur
+1. Page d'écoute en direct :
+   ```vue
+   <template>
+     <div class="live-stream">
+       <audio-player 
+         :stream-url="ICECAST_STREAM_URL"
+         :show-metadata="true"
+       />
+       <live-chat />
+     </div>
+   </template>
+   ```
+
+2. Soumission d'enregistrements :
+   - Utiliser le composant Record.vue existant
+   - Ajouter un formulaire de métadonnées
+   - État de modération visible
+
+3. Chat en direct et interactions :
+   - WebSocket pour les messages instantanés
+   - Réactions en temps réel
+   - Requêtes d'enregistrements
+
+### 4. Sécurité et Modération
+
+1. Système de rôles :
+   ```javascript
+   const roles = {
+     ADMIN: 'admin',
+     MODERATOR: 'moderator',
+     BROADCASTER: 'broadcaster',
+     LISTENER: 'listener'
+   }
+   ```
+
+2. Filtres automatiques :
+   - Détection de silence/bruit
+   - Vérification de la qualité audio
+   - Limites de durée
+   - Détection de contenu inapproprié
+
+### 5. Infrastructure Technique
+
+1. Serveur de streaming :
+   - Serveur dédié avec ressources garanties
+   - SSL/TLS pour le streaming sécurisé
+   - CDN pour la distribution globale
+
+2. Optimisations :
+   - Mise en cache des flux
+   - Compression audio adaptative
+   - Load balancing pour les pics d'audience
+
+### 6. Intégrations
+
+1. Authentification :
+   - Continuer avec Supabase Auth
+   - Ajouter des rôles personnalisés
+   - OAuth pour les réseaux sociaux
+
+2. Analytics :
+   - Suivi des auditeurs en temps réel
+   - Statistiques d'écoute
+   - Rapports de performance
+
+### 7. Roadmap de Développement
+
+1. Phase 1 : Infrastructure
+   - Setup serveur Icecast
+   - Configuration base de données
+   - Tests de performance
+
+2. Phase 2 : Fonctionnalités de Base
+   - Interface d'écoute
+   - Système de soumission
+   - Modération basique
+
+3. Phase 3 : Fonctionnalités Avancées
+   - Chat en direct
+   - Programmation automatique
+   - Analytics
+
+4. Phase 4 : Optimisation
+   - UX/UI raffinée
+   - Performance
+   - Scalabilité
+
+## Requirements Techniques
+
+1. Serveur :
+   - CPU : 4+ cores
+   - RAM : 8GB minimum
+   - Stockage : SSD 100GB+
+   - Bande passante : 100Mbps+
+
+2. Client :
+   - Navigation moderne avec WebRTC
+   - Support des codecs audio modernes
+   - Connexion stable
+
+3. Logiciels :
+   - Node.js 16+
+   - Icecast 2.4+
+   - Redis pour le caching
+   - FFmpeg pour le traitement audio
+
+## Notes de Sécurité
+
+1. Protéger contre :
+   - DDoS
+   - Injection SQL
+   - XSS
+   - CSRF
+
+2. Encryption :
+   - TLS pour le streaming
+   - Chiffrement des données sensibles
+   - Tokens sécurisés
+
+## Maintenance
+
+1. Backups :
+   - Base de données quotidienne
+   - Enregistrements archivés
+   - Configurations
+
+2. Monitoring :
+   - Santé du serveur
+   - Qualité du stream
+   - Logs d'erreurs
+
+## Budget Estimé
+
+1. Infrastructure :
+   - Serveur dédié : ~100€/mois
+   - CDN : ~50€/mois
+   - Base de données : ~20€/mois
+
+2. Services :
+   - SSL : ~10€/mois
+   - Monitoring : ~30€/mois
+   - Backup : ~20€/mois
+
+Total estimé : ~230€/mois minimum

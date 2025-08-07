@@ -1,8 +1,43 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import SplashScreen from './components/SplashScreen.vue'
 import Home from './components/Home.vue'
 import Record from './components/Record.vue'
+
+// Musique de fond
+const backgroundMusic = ref(null)
+
+onMounted(async () => {
+  if (backgroundMusic.value) {
+    // Définir le volume avant de jouer
+    backgroundMusic.value.volume = 0.2
+    
+    try {
+      // Attendre que l'audio soit chargé
+      await backgroundMusic.value.load()
+      // Jouer la musique
+      const playPromise = backgroundMusic.value.play()
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.warn('Lecture automatique empêchée:', error)
+          // Ajouter un gestionnaire de clic pour démarrer la lecture
+          document.addEventListener('click', () => {
+            backgroundMusic.value.play()
+          }, { once: true })
+        })
+      }
+    } catch (error) {
+      console.error('Erreur de chargement audio:', error)
+    }
+  }
+})
+
+onUnmounted(() => {
+  if (backgroundMusic.value) {
+    backgroundMusic.value.pause()
+    backgroundMusic.value.currentTime = 0
+  }
+})
 
 // State
 const currentView = ref('splash')
@@ -48,6 +83,10 @@ function closeOnboarding() {
 
 <template>
   <div id="app">
+    <audio ref="backgroundMusic" loop class="hidden">
+      <source src="/playlist/Backson.m4a" type="audio/mp4">
+    </audio>
+
     <!-- SplashScreen -->
     <SplashScreen v-if="currentView === 'splash'" />
     
