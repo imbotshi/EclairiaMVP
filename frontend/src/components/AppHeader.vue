@@ -33,6 +33,12 @@
         <img src="/alert.svg" alt="Signaler un problème" class="warning-icon" />
       </div>
     </div>
+    
+    <!-- Header Tabs Navigation -->
+    <HeaderTabs 
+      @tab-change="handleTabChange"
+      ref="headerTabsRef"
+    />
   </header>
 
   <!-- Support Modal -->
@@ -62,6 +68,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import SupportModal from './SupportModal.vue'
 import ReportModal from './ReportModal.vue'
 import TooltipSystem from './TooltipSystem.vue'
+import HeaderTabs from './HeaderTabs.vue'
 
 // Modal state
 const showSupportModal = ref(false)
@@ -71,6 +78,10 @@ const showReportModal = ref(false)
 const showTooltip = ref(false)
 const tooltipText = ref('')
 const tooltipPosition = ref({})
+
+// Header Tabs state
+const headerTabsRef = ref(null)
+const currentTab = ref('Radio')
 
 // Time remaining state
 const timeRemaining = ref(0)
@@ -106,6 +117,16 @@ function handleReport(reportData) {
   // Ici on pourrait envoyer le signalement à la base de données
   closeReportModal()
 }
+
+function handleTabChange(tab) {
+  currentTab.value = tab
+  console.log('Onglet actif:', tab)
+  // Émettre un événement pour informer le composant parent du changement d'onglet
+  emit('tab-change', tab)
+}
+
+// Émettre l'événement pour la communication avec le parent
+const emit = defineEmits(['tab-change'])
 
 // Time remaining functions
 function calculateTimeRemaining() {
@@ -149,7 +170,6 @@ onUnmounted(() => {
 <style scoped>
 /* Header */
 .header {
-  padding: 1rem;
   background: linear-gradient(135deg, #09174C 0%, #1a2b5c 100%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
@@ -157,6 +177,7 @@ onUnmounted(() => {
 }
 
 .header-content {
+  padding: 1rem;
   display: flex;
   align-items: center;
   gap: 1rem;

@@ -1,0 +1,93 @@
+# Task
+Créer un composant Vue.js 3 + Tailwind CSS nommé `HeaderTabs.vue` qui affiche trois onglets horizontaux {Radio, Podcast, Voice} avec un effet de "volet" (bande fine) qui glisse sous l’onglet actif.  
+Le design doit être respecté exactement selon les spécifications ci-dessous.
+
+# Requirements
+
+## Design
+1. Fond blanc pur `#FFFFFF`.
+2. Texte noir `#000000` pour l’onglet actif.
+3. Texte gris `#6B7280` pour les onglets inactifs, avec hover en noir.
+4. Police : `Inter` ou équivalent sans-serif.
+5. Taille du texte : `text-sm` Tailwind (`14px`).
+6. Volet : hauteur `2px`, couleur noire `#000000`, arrondi (`rounded-full`), animé `300ms ease-in-out`.
+7. Alignement centré horizontalement.
+8. Responsive sur mobile, tablette, desktop.
+9. Aucun contenu externe, seulement le header.
+
+## Fonctionnalités
+- Les noms d’onglets viennent du tableau :
+```js
+const tabs = ["Radio", "Podcast", "Voice"];
+```
+- `activeTab` est une variable réactive (`ref`) définissant l’onglet actif.
+- Position du volet calculée via `offsetWidth` et `offsetLeft`.
+- Animation fluide sur changement d’onglet.
+- Pas de rechargement de page lors du changement d’onglet.
+- Chaque onglet est un `<button>` avec `aria-pressed` correspondant à l’état actif.
+
+## Technologies
+- Vue.js 3 (Composition API)
+- Tailwind CSS
+- Aucun style inline sauf pour largeur/position dynamique du volet.
+
+# Output Code
+Créer un fichier `HeaderTabs.vue` avec ce code :
+
+```vue
+<template>
+  <div class="relative border-b border-gray-200 bg-white">
+    <div class="flex justify-center space-x-8 relative">
+      <button
+        v-for="tab in tabs"
+        :key="tab"
+        @click="activeTab = tab"
+        class="py-3 text-sm font-medium transition-colors"
+        :class="activeTab === tab ? 'text-black' : 'text-gray-500 hover:text-black'"
+        :aria-pressed="activeTab === tab"
+      >
+        {{ tab }}
+      </button>
+
+      <!-- Volet -->
+      <div
+        class="absolute bottom-0 h-[2px] bg-black rounded-full transition-all duration-300 ease-in-out"
+        :style="{ width: `${tabWidth}px`, transform: `translateX(${tabOffset}px)` }"
+      ></div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted, watch, nextTick } from "vue";
+
+const tabs = ["Radio", "Podcast", "Voice"];
+const activeTab = ref("Radio");
+
+const tabWidth = ref(0);
+const tabOffset = ref(0);
+
+const updateBarPosition = () => {
+  const buttons = document.querySelectorAll("button");
+  const activeBtn = Array.from(buttons).find(btn => btn.textContent.trim() === activeTab.value);
+  if (activeBtn) {
+    tabWidth.value = activeBtn.offsetWidth;
+    tabOffset.value = activeBtn.offsetLeft - buttons[0].offsetLeft;
+  }
+};
+
+onMounted(() => {
+  nextTick(updateBarPosition);
+});
+
+watch(activeTab, () => {
+  nextTick(updateBarPosition);
+});
+</script>
+```
+
+# Acceptance Criteria
+- Les onglets sont centrés et espacés uniformément.
+- Le surlignage glisse en douceur d’un onglet à l’autre.
+- Le design est identique aux spécifications.
+- Fonctionne sur toutes tailles d’écran.
