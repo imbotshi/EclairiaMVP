@@ -1,0 +1,401 @@
+{
+  "total_places": 12549,
+  "countries_count": {
+    "Chile": 190,
+    "Mexico": 287,
+    "Spain": 662,
+    "United States": 2282,
+    "Guatemala": 47,
+    "Brazil": 1461,
+    "Argentina": 435,
+    "Ukraine": 50,
+    "Malta": 17,
+    "Malaysia": 29,
+    "Luxembourg": 14,
+    "Switzerland": 74,
+    "Israel": 29,
+    "Tunisia": 18,
+    "Ecuador": 52,
+    "Greece": 128,
+    "Bosnia and Herzegovina": 56,
+    "Hungary": 43,
+    "Uruguay": 57,
+    "Netherlands": 295,
+    "France": 551,
+    "North Macedonia": 14,
+    "Federated States of Micronesia": 1,
+    "Paraguay": 62,
+    "Colombia": 338,
+    "Dominican Republic": 36,
+    "Czechia": 34,
+    "Poland": 140,
+    "Mayotte": 6,
+    "Curaçao": 1,
+    "Madeira": 9,
+    "Kenya": 36,
+    "Libya": 7,
+    "Canada": 312,
+    "Australia": 223,
+    "South Africa": 97,
+    "Italy": 541,
+    "Indonesia": 173,
+    "Türkiye": 98,
+    "Romania": 76,
+    "Russia": 163,
+    "Iraq": 10,
+    "Dominica": 3,
+    "United Kingdom": 467,
+    "Bolivia": 25,
+    "Antigua and Barbuda": 4,
+    "El Salvador": 18,
+    "Serbia": 63,
+    "Nigeria": 96,
+    "Mauritius": 6,
+    "Madagascar": 7,
+    "Slovenia": 34,
+    "Lithuania": 11,
+    "Pakistan": 18,
+    "Saint Helena": 1,
+    "India": 177,
+    "Senegal": 19,
+    "Venezuela": 80,
+    "United Arab Emirates": 6,
+    "Qatar": 2,
+    "Denmark": 42,
+    "Croatia": 90,
+    "Cambodia": 1,
+    "China": 44,
+    "Nepal": 32,
+    "Tanzania": 27,
+    "Norway": 69,
+    "Réunion": 11,
+    "Uganda": 49,
+    "Peru": 102,
+    "Cape Verde": 7,
+    "Kosovo": 12,
+    "Yemen": 8,
+    "Latvia": 8,
+    "Portugal": 166,
+    "Kazakhstan": 7,
+    "Bahrain": 3,
+    "Bulgaria": 24,
+    "Algeria": 48,
+    "Fiji": 2,
+    "Honduras": 33,
+    "Austria": 38,
+    "Haiti": 18,
+    "Belgium": 114,
+    "Cuba": 19,
+    "Puerto Rico": 29,
+    "Togo": 8,
+    "Martinique": 12,
+    "Namibia": 5,
+    "Saint-Pierre et Miquelon": 1,
+    "Sri Lanka": 38,
+    "Sweden": 71,
+    "Trinidad and Tobago": 17,
+    "Bailiwick of Guernsey": 3,
+    "Zambia": 18,
+    "Bailiwick of Jersey": 1,
+    "Japan": 19,
+    "New Zealand": 52,
+    "Armenia": 2,
+    "British Virgin Islands": 2,
+    "Guam": 5,
+    "Saint Vincent and the Grenadines": 4,
+    "Barbados": 3,
+    "Rwanda": 8,
+    "Taiwan": 11,
+    "Thailand": 61,
+    "Nicaragua": 17,
+    "Ireland": 52,
+    "Andorra": 3,
+    "Sint Maarten": 2,
+    "Panama": 14,
+    "Montenegro": 12,
+    "Lebanon": 13,
+    "Belize": 6,
+    "Zimbabwe": 7,
+    "Northern Mariana Islands": 2,
+    "Comoros": 2,
+    "Costa Rica": 28,
+    "Germany": 302,
+    "Iceland": 3,
+    "Falkland Islands": 2,
+    "Georgia": 8,
+    "Saint Kitts and Nevis": 2,
+    "Grenada": 5,
+    "Mozambique": 12,
+    "South Korea": 6,
+    "Syria": 9,
+    "Tahiti": 1,
+    "Lesotho": 1,
+    "Guadeloupe": 7,
+    "Palestine": 9,
+    "Cayman Islands": 2,
+    "Jamaica": 10,
+    "Belarus": 10,
+    "Ghana": 40,
+    "Vanuatu": 1,
+    "Slovakia": 16,
+    "Vietnam": 3,
+    "Morocco": 10,
+    "Cyprus": 6,
+    "Angola": 8,
+    "Democratic Republic of the Congo": 10,
+    "Burkina Faso": 16,
+    "Central African Republic": 1,
+    "Estonia": 10,
+    "Bangladesh": 5,
+    "Botswana": 3,
+    "Benin": 6,
+    "Ethiopia": 3,
+    "Jordan": 2,
+    "Timor-Leste": 3,
+    "Kuwait": 2,
+    "Kyrgyzstan": 3,
+    "Macau": 1,
+    "Mauritania": 1,
+    "Montserrat": 1,
+    "Myanmar (Burma)": 2,
+    "Nauru": 1,
+    "Saudi Arabia": 3,
+    "Cameroon": 5,
+    "Albania": 7,
+    "Samoa": 1,
+    "Finland": 24,
+    "Oman": 2,
+    "Solomon Islands": 1,
+    "Cook Islands": 1,
+    "Brunei": 3,
+    "Bermuda": 1,
+    "Republic of the Congo": 2,
+    "Aruba": 2,
+    "Egypt": 5,
+    "Saint Lucia": 5,
+    "São Tomé and Príncipe": 1,
+    "U.S. Virgin Islands": 3,
+    "Sierra Leone": 7,
+    "Suriname": 3,
+    "The Bahamas": 2,
+    "Guyana": 2,
+    "Niger": 4,
+    "Liberia": 1,
+    "Tonga": 1,
+    "Kiribati": 1,
+    "Turks and Caicos Islands": 2,
+    "The Gambia": 4,
+    "Uzbekistan": 2,
+    "Côte d'Ivoire": 7,
+    "Iran": 1,
+    "Papua New Guinea": 3,
+    "Moldova": 5,
+    "French Guiana": 2,
+    "Mali": 6,
+    "Anguilla": 2,
+    "Laos": 1,
+    "Azores": 9,
+    "Saint Barthélemy": 1,
+    "Somalia": 2,
+    "Chad": 1,
+    "Burundi": 2,
+    "New Calédonia": 1,
+    "Guinea": 2,
+    "Malawi": 10,
+    "South Sudan": 1,
+    "Wallis and Futuna": 1,
+    "North Korea": 1,
+    "Guiné-Bissau": 1,
+    "Marshall Islands": 1,
+    "Azerbaijan": 3,
+    "Philippines": 122,
+    "Eswatini": 2,
+    "Tajikistan": 4,
+    "Sudan": 3,
+    "Gabon": 1,
+    "Liechtenstein": 1,
+    "Collectivity of Saint Martin": 2,
+    "Monaco": 2,
+    "Hong Kong": 1,
+    "Afghanistan": 1,
+    "Mongolia": 2,
+    "Seychelles": 1,
+    "Bhutan": 1,
+    "Isle of Man": 2,
+    "American Samoa": 1,
+    "Åland Islands": 2,
+    "Greenland": 1,
+    "Faroe Islands": 2,
+    "Vatican City": 1,
+    "Gibraltar": 1,
+    "San Marino": 1,
+    "Singapore": 1
+  },
+  "potential_african_countries": [
+    [
+      "Tunisia",
+      18
+    ],
+    [
+      "Kenya",
+      36
+    ],
+    [
+      "Libya",
+      7
+    ],
+    [
+      "South Africa",
+      97
+    ],
+    [
+      "Nigeria",
+      96
+    ],
+    [
+      "Madagascar",
+      7
+    ],
+    [
+      "Senegal",
+      19
+    ],
+    [
+      "Tanzania",
+      27
+    ],
+    [
+      "Uganda",
+      49
+    ],
+    [
+      "Algeria",
+      48
+    ],
+    [
+      "Togo",
+      8
+    ],
+    [
+      "Namibia",
+      5
+    ],
+    [
+      "Zambia",
+      18
+    ],
+    [
+      "Rwanda",
+      8
+    ],
+    [
+      "Zimbabwe",
+      7
+    ],
+    [
+      "Mozambique",
+      12
+    ],
+    [
+      "Ghana",
+      40
+    ],
+    [
+      "Morocco",
+      10
+    ],
+    [
+      "Angola",
+      8
+    ],
+    [
+      "Democratic Republic of the Congo",
+      10
+    ],
+    [
+      "Burkina Faso",
+      16
+    ],
+    [
+      "Central African Republic",
+      1
+    ],
+    [
+      "Botswana",
+      3
+    ],
+    [
+      "Benin",
+      6
+    ],
+    [
+      "Ethiopia",
+      3
+    ],
+    [
+      "Mauritania",
+      1
+    ],
+    [
+      "Cameroon",
+      5
+    ],
+    [
+      "Republic of the Congo",
+      2
+    ],
+    [
+      "Egypt",
+      5
+    ],
+    [
+      "Sierra Leone",
+      7
+    ],
+    [
+      "Niger",
+      4
+    ],
+    [
+      "Liberia",
+      1
+    ],
+    [
+      "Papua New Guinea",
+      3
+    ],
+    [
+      "Mali",
+      6
+    ],
+    [
+      "Somalia",
+      2
+    ],
+    [
+      "Chad",
+      1
+    ],
+    [
+      "Burundi",
+      2
+    ],
+    [
+      "Guinea",
+      2
+    ],
+    [
+      "South Sudan",
+      1
+    ],
+    [
+      "Sudan",
+      3
+    ],
+    [
+      "Gabon",
+      1
+    ]
+  ],
+  "potential_african_places": []
+}

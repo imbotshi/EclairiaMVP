@@ -1,8 +1,10 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
 import SplashScreen from './components/SplashScreen.vue'
-import Home from './components/Home.vue'
 import Record from './components/Record.vue'
+
+// App root
 
 // Musique de fond
 const backgroundMusic = ref(null)
@@ -83,18 +85,10 @@ function closeOnboarding() {
 
 <template>
   <div id="app">
-    <audio ref="backgroundMusic" loop class="hidden">
-      <source src="/playlist/Backson.m4a" type="audio/mp4">
-    </audio>
-
+    <router-view />
+    
     <!-- SplashScreen -->
     <SplashScreen v-if="currentView === 'splash'" />
-    
-    <!-- Home Screen -->
-    <Home 
-      v-else-if="currentView === 'home'" 
-      @open-record="openRecordModal"
-    />
     
     <!-- Record Modal -->
     <Record 

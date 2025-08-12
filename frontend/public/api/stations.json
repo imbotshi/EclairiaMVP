@@ -1,0 +1,93 @@
+[
+  {
+    "id": "99oEZY6q",
+    "name": "Top Congo FM",
+    "country": "RDC",
+    "city": "Kinshasa",
+    "stream": "https://radio.garden/api/ara/content/listen/99oEZY6q/channel.mp3",
+    "genre": "Musique/Variétés",
+    "language": "Français/Lingala"
+  },
+  {
+    "id": "Jo6CKzEH",
+    "name": "Radio Okapi",
+    "country": "RDC",
+    "city": "Kinshasa",
+    "stream": "https://radio.garden/api/ara/content/listen/Jo6CKzEH/channel.mp3",
+    "genre": "Info/Actualités",
+    "language": "Français/Lingala"
+  },
+  {
+    "id": "9wYTkeg5",
+    "name": "Radio Digital Congo",
+    "country": "RDC",
+    "city": "Kinshasa",
+    "stream": "https://radio.garden/api/ara/content/listen/9wYTkeg5/channel.mp3",
+    "genre": "Généraliste",
+    "language": "Français"
+  },
+  {
+    "id": "GVAFqjMC",
+    "name": "Rewmi FM",
+    "country": "Sénégal",
+    "city": "Dakar",
+    "stream": "https://radio.garden/api/ara/content/listen/GVAFqjMC/channel.mp3",
+    "genre": "Info/Musique",
+    "language": "Français/Wolof"
+  },
+  {
+    "id": "FBqjFK6J",
+    "name": "Radio Dakar City",
+    "country": "Sénégal",
+    "city": "Dakar",
+    "stream": "https://radio.garden/api/ara/content/listen/FBqjFK6J/channel.mp3",
+    "genre": "Musique urbaine",
+    "language": "Français"
+  },
+  {
+    "id": "pbiwLjg8",
+    "name": "H24 Senegal",
+    "country": "Sénégal",
+    "city": "Dakar",
+    "stream": "https://radio.garden/api/ara/content/listen/pbiwLjg8/channel.mp3",
+    "genre": "Info continue",
+    "language": "Français"
+  },
+  {
+    "id": "BdYoSehp",
+    "name": "Radio Urum-Bi",
+    "country": "Sénégal",
+    "city": "Dakar",
+    "stream": "https://radio.garden/api/ara/content/listen/BdYoSehp/channel.mp3",
+    "genre": "Musique traditionnelle",
+    "language": "Wolof"
+  }
+  ,
+  {
+    "id": "8N8Gru0O",
+    "name": "Radio Bonne Nouvelle FM 99.6",
+    "country": "Cameroun",
+    "city": "Douala",
+    "stream": "https://radio.garden/api/ara/content/listen/8N8Gru0O/channel.mp3",
+    "genre": "Religieux / Général",
+    "language": "Français"
+  },
+  {
+    "id": "xEEkHWU5",
+    "name": "Balla Radio",
+    "country": "Cameroun",
+    "city": "Yaoundé",
+    "stream": "https://radio.garden/api/ara/content/listen/xEEkHWU5/channel.mp3",
+    "genre": "Musique",
+    "language": "Français"
+  },
+  {
+    "id": "wVjn9ASB",
+    "name": "RVC Radio Voice of the Cross",
+    "country": "Cameroun",
+    "city": "Yaoundé",
+    "stream": "https://radio.garden/api/ara/content/listen/wVjn9ASB/channel.mp3",
+    "genre": "Religieux",
+    "language": "Français"
+  }
+]

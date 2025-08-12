@@ -1,19 +1,102 @@
 <template>
-  <div class="sphere-container">
+  <div class="sphere-container" 
+       @click="handleSphereClick"
+       @touchstart="handleTouchStart"
+       @touchend="handleTouchEnd">
     <canvas ref="canvas" class="sphere-canvas"></canvas>
-
+    
+    <!-- Élément audio caché contrôlé par la sphère -->
+    <audio 
+      ref="audioElement"
+      @loadstart="handleLoadStart"
+      @canplay="handleCanPlay"
+      @play="handlePlay"
+      @pause="handlePause"
+      @error="handleAudioError"
+      crossorigin="anonymous"
+      style="display: none;">
+    </audio>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import * as THREE from 'three'
+import { useRadio } from '../composables/useRadio.js'
 
 const canvas = ref(null)
-const audioActive = ref(false)
+const audioElement = ref(null)
+
+// Utiliser le composable radio (logique copiée de radio-test)
+const {
+  stations,
+  currentStation,
+  validationResults,
+  isPlaying,
+  isLoading,
+  volume,
+  error,
+  loadStations,
+  validateAllStations,
+  selectStation,
+  playAudio,
+  pauseAudio,
+  setVolume,
+  nextStation,
+  previousStation,
+  setupAudioEventListeners,
+  logToResults
+} = useRadio()
+
+// État audio réactif (compatible avec l'ancien code)
+const audioState = ref({
+  get isPlaying() { return isPlaying.value },
+  get currentStation() { return currentStation.value },
+  get volume() { return volume.value },
+  get isLoading() { return isLoading.value },
+  get error() { return error.value }
+})
 
 let scene, camera, renderer, sphere, material, analyser, dataArray
 let animationId = null
+let touchStartTime = 0
+let isLongPress = false
+let volumeControlActive = false
+let initialTouchY = 0
+let initialTouchX = 0
+let volumeControlTimeout = null
+let swipeStartTime = 0
+let lastTapTime = 0
+let tapCount = 0
+
+// Props pour recevoir les données
+const props = defineProps({
+  stations: {
+    type: Array,
+    default: () => []
+  },
+  currentStationId: {
+    type: String,
+    default: null
+  },
+  autoPlay: {
+    type: Boolean,
+    default: false
+  }
+})
+
+// Emits pour communiquer avec le parent
+const emit = defineEmits([
+  'play-started',
+  'play-paused', 
+  'station-changed',
+  'audio-error',
+  'loading-state',
+  'volume-changed',
+  'next-station',
+  'previous-station',
+  'double-tap'
+])
 
 // Vertex Shader
 const vertexShader = `
@@ -26,9 +109,11 @@ const vertexShader = `
   }
 `
 
-// Fragment Shader
+// Fragment Shader avec états audio avancés
 const fragmentShader = `
   uniform float time;
+  uniform float audioState; // 0.0 = pause, 1.0 = play, 0.5 = loading, 0.3 = volume, 0.8 = special
+  uniform float volume; // Volume pour effets visuels
   varying vec2 vUv;
 
   void main() {
@@ -36,15 +121,37 @@ const fragmentShader = `
     float wave = sin(uv.x * 10.0 + time) * 0.05;
     uv.y += wave;
 
-    vec3 color1 = vec3(0.0, 1.0, 1.0);
-    vec3 color2 = vec3(0.3, 0.0, 1.0);
-    vec3 color3 = vec3(1.0, 0.0, 1.0);
+    // Couleurs selon l'état audio
+    vec3 pauseColor = vec3(0.3, 0.3, 0.8);     // Bleu calme
+    vec3 playColor = vec3(0.0, 1.0, 0.5);      // Vert actif
+    vec3 loadColor = vec3(1.0, 0.5, 0.0);      // Orange loading
+    vec3 volumeColor = vec3(0.8, 0.2, 0.8);    // Magenta volume
+    vec3 specialColor = vec3(1.0, 0.8, 0.0);   // Or spécial
+    
+    vec3 baseColor;
+    if (audioState < 0.15) {
+      baseColor = pauseColor;
+    } else if (audioState < 0.35) {
+      baseColor = volumeColor;
+    } else if (audioState < 0.65) {
+      baseColor = loadColor;
+    } else if (audioState < 0.85) {
+      baseColor = specialColor;
+    } else {
+      baseColor = playColor;
+    }
+    
+    // Appliquer le dégradé avec effet volume
+    vec3 color = mix(baseColor * 0.7, baseColor, uv.x);
+    color = mix(color, baseColor * (1.0 + volume * 0.5), uv.y);
 
-    vec3 color = mix(color1, color2, uv.x);
-    color = mix(color, color3, uv.y);
-
-    float pulse = 0.5 + 0.5 * sin(time * 2.0);
-    color *= 0.8 + pulse * 0.2;
+    // Pulsation selon l'état et volume
+    float pulseSpeed = audioState > 0.75 ? 3.0 : (audioState > 0.25 ? 2.0 : 1.5);
+    float pulse = 0.5 + 0.5 * sin(time * pulseSpeed);
+    
+    // Intensité basée sur le volume
+    float intensity = 0.8 + pulse * (0.2 + volume * 0.3);
+    color *= intensity;
 
     gl_FragColor = vec4(color, 1.0);
   }
@@ -72,13 +179,15 @@ function initThreeJS() {
   // Sphere Geometry
   const geometry = new THREE.SphereGeometry(1, 128, 128)
 
-  // Shader Material
+  // Shader Material avec uniforms audio
   material = new THREE.ShaderMaterial({
     vertexShader,
     fragmentShader,
     uniforms: {
       time: { value: 0 },
-      amplitude: { value: 0 }
+      amplitude: { value: 0 },
+      audioState: { value: 0.0 }, // 0.0 = pause, 1.0 = play, 0.5 = loading, 0.3 = volume, 0.8 = special
+      volume: { value: 0.8 } // Volume pour effets visuels
     },
     side: THREE.DoubleSide
   })
@@ -116,21 +225,7 @@ function initThreeJS() {
   scene.add(particles)
 }
 
-async function initAudio() {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)()
-    const source = audioContext.createMediaStreamSource(stream)
-    analyser = audioContext.createAnalyser()
-    analyser.fftSize = 256
-    const bufferLength = analyser.frequencyBinCount
-    dataArray = new Uint8Array(bufferLength)
-    source.connect(analyser)
-    audioActive.value = true
-  } catch (error) {
-    console.error('Erreur d\'accès au microphone:', error)
-  }
-}
+
 
 function animate(time) {
   animationId = requestAnimationFrame(animate)
@@ -149,13 +244,8 @@ function animate(time) {
   // Update shader time
   material.uniforms.time.value = time * 0.001
 
-  // Audio analysis
-  if (analyser) {
-    analyser.getByteFrequencyData(dataArray)
-    let avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length
-    let normalized = avg / 256
-    material.uniforms.amplitude.value = normalized
-  }
+  // Mise à jour des uniforms audio
+  updateShaderUniforms()
 
   renderer.render(scene, camera)
 }
@@ -169,20 +259,360 @@ function handleResize() {
   renderer.setSize(container.clientWidth, container.clientHeight)
 }
 
-onMounted(() => {
+// === FONCTIONS AUDIO (LOGIQUE RADIO-TEST) ===
+
+// Charger la station actuelle (utilise la logique radio-test)
+function loadCurrentStation() {
+  const station = stations.value.find(s => s.id === props.currentStationId)
+  if (station) {
+    selectStation(station)
+    updateShaderUniforms()
+    emit('station-changed', currentStation.value)
+  }
+}
+
+// Lecture audio (utilise la logique radio-test)
+async function playAudioRadio() {
+  try {
+    await playAudio(audioElement.value)
+    updateShaderUniforms()
+    emit('play-started', currentStation.value)
+  } catch (error) {
+    updateShaderUniforms()
+    emit('audio-error', error.message)
+  }
+}
+
+// Pause audio (utilise la logique radio-test)
+function pauseAudioRadio() {
+  pauseAudio(audioElement.value)
+  updateShaderUniforms()
+  emit('play-paused')
+}
+
+// Mettre à jour les uniforms des shaders
+function updateShaderUniforms() {
+  if (!material) return
+
+  // État visuel selon l'état audio
+  if (audioState.value.isPlaying) {
+    material.uniforms.audioState.value = 1.0 // Vert actif
+    material.uniforms.amplitude.value = 0.5
+  } else if (audioState.value.isLoading) {
+    material.uniforms.audioState.value = 0.5 // Orange loading
+    material.uniforms.amplitude.value = 0.3
+  } else {
+    material.uniforms.audioState.value = 0.0 // Bleu pause
+    material.uniforms.amplitude.value = 0.1
+  }
+  
+  // Mettre à jour l'uniform volume
+  material.uniforms.volume.value = audioState.value.volume
+}
+
+// === GESTIONNAIRES D'ÉVÉNEMENTS AUDIO (RADIO-TEST) ===
+// Ces gestionnaires sont maintenant gérés par le composable useRadio
+// mais on garde les émissions pour la compatibilité
+
+function handleLoadStart() {
+  updateShaderUniforms()
+  emit('loading-state', true)
+}
+
+function handleCanPlay() {
+  updateShaderUniforms()
+  emit('loading-state', false)
+}
+
+function handlePlay() {
+  updateShaderUniforms()
+  emit('play-started', currentStation.value)
+}
+
+function handlePause() {
+  updateShaderUniforms()
+  emit('play-paused')
+}
+
+function handleAudioError(event) {
+  updateShaderUniforms()
+  emit('audio-error', 'Impossible de lire cette station')
+}
+
+// === GESTIONNAIRES D'ÉVÉNEMENTS TACTILES ===
+
+// Gestionnaire principal de clic (logique radio-test)
+async function handleSphereClick() {
+  logToResults('🎯 Sphère cliquée', 'info')
+  if (isLoading.value) {
+    // Ignorer les clics pendant le chargement
+    return
+  }
+  
+  try {
+    if (isPlaying.value) {
+      pauseAudioRadio()
+    } else {
+      await playAudioRadio()
+    }
+  } catch (error) {
+    logToResults(`Erreur lors du clic: ${error.message}`, 'error')
+  }
+}
+
+function handleTouchStart(event) {
+  event.preventDefault()
+  touchStartTime = Date.now()
+  isLongPress = false
+  volumeControlActive = false
+  
+  if (event.touches && event.touches[0]) {
+    initialTouchY = event.touches[0].clientY
+    initialTouchX = event.touches[0].clientX
+    swipeStartTime = Date.now()
+  }
+  
+  // Détecter un appui long après 500ms pour contrôle volume
+  volumeControlTimeout = setTimeout(() => {
+    if (Date.now() - touchStartTime >= 500) {
+      isLongPress = true
+      volumeControlActive = true
+      console.log('🔊 Contrôle volume activé')
+      
+      // Effet visuel pour le contrôle volume
+      if (sphere) {
+        sphere.scale.setScalar(1.15)
+        // Changer la couleur pour indiquer le mode volume
+        if (material) {
+          material.uniforms.audioState.value = 0.3 // Couleur spéciale volume
+        }
+      }
+      
+      // Ajouter les listeners pour le contrôle volume
+      document.addEventListener('touchmove', handleVolumeControl, { passive: false })
+    }
+  }, 500)
+}
+
+// Gestionnaire de tap (simple/double)
+function handleTapGesture() {
+  const currentTime = Date.now()
+  const timeSinceLastTap = currentTime - lastTapTime
+  
+  if (timeSinceLastTap < 300) {
+    // Double tap détecté
+    tapCount = 0
+    lastTapTime = 0
+    console.log('👆👆 Double tap - Action spéciale')
+    emit('double-tap')
+    
+    // Action spéciale : basculer entre stations favorites
+    handleDoubleTapAction()
+  } else {
+    // Premier tap ou tap simple
+    tapCount = 1
+    lastTapTime = currentTime
+    
+    // Attendre 300ms pour voir s'il y a un deuxième tap
+    setTimeout(() => {
+      if (tapCount === 1 && Date.now() - lastTapTime >= 300) {
+        // Tap simple confirmé
+        console.log('👆 Tap simple')
+        handleSphereClick()
+        tapCount = 0
+        lastTapTime = 0
+      }
+    }, 300)
+  }
+}
+
+// Action spéciale pour double tap
+function handleDoubleTapAction() {
+  // Exemple : basculer le mode aléatoire ou favoris
+  console.log('✨ Mode spécial activé')
+  
+  // Effet visuel spécial
+  if (sphere) {
+    // Animation de "flash"
+    sphere.scale.setScalar(1.3)
+    setTimeout(() => {
+      if (sphere) sphere.scale.setScalar(1.0)
+    }, 200)
+  }
+  
+  // Changer temporairement la couleur
+  if (material) {
+    const originalState = material.uniforms.audioState.value
+    material.uniforms.audioState.value = 0.8 // Couleur spéciale
+    setTimeout(() => {
+      if (material) material.uniforms.audioState.value = originalState
+    }, 500)
+  }
+}
+
+// Gestionnaire de contrôle volume
+function handleVolumeControl(event) {
+  if (!volumeControlActive || !event.touches || !event.touches[0]) return
+  
+  event.preventDefault()
+  const currentY = event.touches[0].clientY
+  const deltaY = initialTouchY - currentY // Inversé : haut = augmenter
+  const sensitivity = 200 // Pixels pour aller de 0 à 100%
+  
+  const volumeChange = deltaY / sensitivity
+  const newVolume = Math.max(0, Math.min(1, audioState.value.volume + volumeChange))
+  
+  setVolumeRadio(newVolume)
+  initialTouchY = currentY // Mise à jour pour le mouvement continu
+}
+
+// Fonction pour définir le volume (logique radio-test)
+function setVolumeRadio(newVolume) {
+  setVolume(newVolume, audioElement.value)
+  
+  // Feedback visuel du volume via l'amplitude
+  if (material) {
+    material.uniforms.amplitude.value = 0.2 + (volume.value * 0.4) // 0.2 à 0.6
+  }
+  
+  emit('volume-changed', volume.value)
+}
+
+function handleTouchEnd(event) {
+  event.preventDefault()
+  const touchDuration = Date.now() - touchStartTime
+  
+  // Nettoyer les timeouts et listeners
+  if (volumeControlTimeout) {
+    clearTimeout(volumeControlTimeout)
+    volumeControlTimeout = null
+  }
+  
+  document.removeEventListener('touchmove', handleVolumeControl)
+  
+  // Remettre la taille et couleur normales
+  if (sphere) {
+    sphere.scale.setScalar(1.0)
+  }
+  
+  // Remettre la couleur selon l'état audio
+  updateShaderUniforms()
+  
+  // Détecter les swipes horizontaux
+  if (!isLongPress && !volumeControlActive && event.changedTouches && event.changedTouches[0]) {
+    const finalTouchX = event.changedTouches[0].clientX
+    const swipeDistance = finalTouchX - initialTouchX
+    const swipeTime = Date.now() - swipeStartTime
+    
+    // Swipe détecté si distance > 50px et temps < 300ms
+    if (Math.abs(swipeDistance) > 50 && swipeTime < 300) {
+      if (swipeDistance > 0) {
+        logToResults('➡️ Swipe droite - Station suivante', 'info')
+        nextStation(audioElement.value)
+        emit('next-station')
+        emit('station-changed', currentStation.value)
+      } else {
+        logToResults('⬅️ Swipe gauche - Station précédente', 'info')
+        previousStation(audioElement.value)
+        emit('previous-station')
+        emit('station-changed', currentStation.value)
+      }
+    } else if (touchDuration < 500) {
+      // Tap rapide - détecter double tap
+      handleTapGesture()
+    }
+  } else if (volumeControlActive) {
+    console.log('🔊 Contrôle volume terminé')
+  }
+  
+  // Reset des variables
+  touchStartTime = 0
+  isLongPress = false
+  volumeControlActive = false
+  initialTouchY = 0
+  initialTouchX = 0
+  swipeStartTime = 0
+  // Note: lastTapTime et tapCount ne sont pas reset ici pour le double tap
+}
+
+// Watcher pour les changements de station (logique radio-test)
+watch(() => props.currentStationId, (newStationId) => {
+  if (newStationId && stations.value.length > 0) {
+    loadCurrentStation()
+  }
+})
+
+watch(() => props.stations, (newStations) => {
+  if (newStations.length > 0 && props.currentStationId) {
+    loadCurrentStation()
+  }
+})
+
+onMounted(async () => {
+  // Initialiser Three.js
   initThreeJS()
   animate()
   window.addEventListener('resize', handleResize)
+  
+  // Configurer les événements audio (logique radio-test)
+  if (audioElement.value) {
+    setupAudioEventListeners(audioElement.value)
+  }
+  
+  // Charger les stations depuis l'API radio-test
+  try {
+    await loadStations()
+    logToResults(`✅ ${stations.value.length} stations chargées depuis radio-test`, 'success')
+    
+    // Valider toutes les stations (optionnel)
+    if (stations.value.length > 0) {
+      logToResults('🔍 Validation des stations en arrière-plan...', 'info')
+      validateAllStations().then(() => {
+        logToResults('✅ Validation des stations terminée', 'success')
+      })
+    }
+    
+    // Charger la station initiale si spécifiée
+    if (props.currentStationId) {
+      loadCurrentStation()
+    } else if (stations.value.length > 0) {
+      // Sélectionner la première station par défaut
+      selectStation(stations.value[0])
+      logToResults(`🎵 Station par défaut: ${stations.value[0].name}`, 'info')
+    }
+    
+  } catch (error) {
+    logToResults(`❌ Erreur de chargement des stations: ${error.message}`, 'error')
+  }
 })
 
 onUnmounted(() => {
+  // Nettoyer les animations
   if (animationId) {
     cancelAnimationFrame(animationId)
   }
-  window.removeEventListener('resize', handleResize)
   
+  // Nettoyer les événements
+  window.removeEventListener('resize', handleResize)
+  document.removeEventListener('touchmove', handleVolumeControl)
+  
+  // Nettoyer les timeouts
+  if (volumeControlTimeout) {
+    clearTimeout(volumeControlTimeout)
+  }
+  
+  // Arrêter l'audio
+  if (audioElement.value) {
+    audioElement.value.pause()
+    audioElement.value.src = ''
+  }
+  
+  // Nettoyer Three.js
   if (renderer) {
     renderer.dispose()
+  }
+  if (material) {
+    material.dispose()
   }
 })
 </script>

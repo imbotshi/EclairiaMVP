@@ -1,0 +1,328 @@
+# Radio Player with Integrated Proxy — Projet complet
+
+Ce projet contient un **frontend** (lecteur web) et un **backend Node/Express** qui sert les fichiers statiques et agit comme **proxy pour les flux radio** afin de résoudre les problèmes CORS.
+
+> Les fichiers du projet sont inclus ci-dessous. Ouvre ce document dans la zone Canvas pour copier chaque fichier dans ton projet.
+
+---
+
+## Structure du projet
+
+```
+radio-player/
+├── package.json
+├── server.js
+├── stations.json
+└── public/
+    ├── index.html
+    ├── script.js
+    └── styles.css
+```
+
+---
+
+## package.json
+
+```json
+{
+  "name": "radio-player",
+  "version": "1.0.0",
+  "description": "Lecteur radio Web avec proxy pour contourner le CORS",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "NODE_ENV=development node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-fetch": "^3.4.4"
+  }
+}
+```
+
+---
+
+## server.js
+
+```js
+import express from 'express';
+import fetch from 'node-fetch';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+
+// Serve static files
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Simple security: whitelist domains if needed (optional)
+const ALLOWLIST = null; // ex: ['stream.radio-okapi.net']
+
+function isAllowed(urlString){
+  if (!ALLOWLIST) return true;
+  try{
+    const u = new URL(urlString);
+    return ALLOWLIST.includes(u.hostname);
+  }catch(e){ return false; }
+}
+
+// Proxy endpoint
+app.get('/proxy', async (req, res) => {
+  const targetUrl = req.query.url;
+  if (!targetUrl) return res.status(400).send('Missing url param');
+  if (!isAllowed(targetUrl)) return res.status(403).send('Domain not allowed');
+
+  try{
+    const response = await fetch(targetUrl, { method: 'GET' });
+    if (!response.ok) return res.status(response.status).send(`Error fetching: ${response.statusText}`);
+
+    // Pass through important headers
+    const contentType = response.headers.get('content-type') || 'audio/mpeg';
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Headers', '*');
+    res.set('Content-Type', contentType);
+
+    // Pipe the response body directly
+    response.body.pipe(res);
+
+  }catch(err){
+    console.error('Proxy error', err);
+    res.status(500).send('Error fetching stream');
+  }
+});
+
+// health
+app.get('/health', (req, res) => res.send({ok:true, ts:Date.now()}));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, ()=> console.log(`Server running on http://localhost:${PORT}`));
+```
+
+---
+
+## stations.json
+
+> J'ai inclus ici les stations listées dans ton fichier initial (extraits). Tu peux compléter ou remplacer par ta liste complète.
+
+```json
+[
+  {"id":1,"name":"Radio Okapi","country":"RDC","stream":"http://stream.radio-okapi.net:8000/radioOkapi"},
+  {"id":2,"name":"Top Congo FM","country":"RDC","stream":"http://topcongoradio.ice.infomaniak.ch/topconmgoradio-128.mp3"},
+  {"id":3,"name":"RTGA","country":"RDC","stream":"http://rtga.ice.infomaniak.ch/rtga-128.mp3"},
+  {"id":4,"name":"Raga FM","country":"RDC","stream":"http://ragafm.ice.infomaniak.ch/ragafm-128.mp3"},
+  {"id":5,"name":"Radio Balafon","country":"Cameroun","stream":"http://balafon.ice.infomaniak.ch/balafon-128.mp3"},
+  {"id":6,"name":"RFM Sénégal","country":"Sénégal","stream":"http://rfm-icecast-win.ice.infomaniak.ch/rfm-icecast-win.mp3"},
+  {"id":7,"name":"SoundHelix Sample MP3","country":"Test","stream":"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"},
+  {"id":8,"name":"Bitdash HLS Exemple","country":"Test","stream":"https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8"}
+]
+```
+
+---
+
+## public/index.html
+
+```html
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lecteur Radio — Proxy intégré</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Lecteur Radio — Proxy intégré</h1>
+    </header>
+
+    <main class="container">
+      <aside class="sidebar">
+        <div class="controls">
+          <button id="validateAll">Valider tous les flux</button>
+          <button id="addCustom">+ Ajouter URL</button>
+        </div>
+        <ul id="stationList" class="station-list" aria-live="polite"></ul>
+      </aside>
+
+      <section class="player">
+        <div class="player-top">
+          <div id="status">Aucune station sélectionnée</div>
+          <div class="play-controls">
+            <button id="playPause">▶️ Play</button>
+            <label>Volume <input id="volume" type="range" min="0" max="1" step="0.01" value="0.8"></label>
+          </div>
+        </div>
+
+        <div class="results">
+          <pre id="results">Aucun test effectué.</pre>
+        </div>
+
+        <audio id="audioPlayer" controls crossorigin="anonymous"></audio>
+      </section>
+    </main>
+
+    <footer>
+      Proxy: <code>/proxy?url=...</code> — lancer le serveur et ouvrir <a href="/">http://localhost:3000</a>
+    </footer>
+  </div>
+
+  <script src="/script.js" type="module"></script>
+</body>
+</html>
+```
+
+---
+
+## public/styles.css
+
+```css
+:root{font-family:Inter,system-ui,Segoe UI,Roboto,Arial;}
+body{margin:0;background:#0f1724;color:#e6eef8}
+.app{max-width:1100px;margin:20px auto;padding:16px}
+.container{display:flex;gap:12px}
+.sidebar{width:320px}
+.station-list{list-style:none;padding:0}
+.station-list li{padding:10px;border-radius:8px;background:rgba(255,255,255,0.03);margin-bottom:8px;cursor:pointer}
+.station-list li.playing{outline:2px solid rgba(99,102,241,0.25)}
+.player{flex:1}
+.player-top{display:flex;justify-content:space-between;align-items:center}
+.results{margin-top:12px;background:rgba(255,255,255,0.02);padding:8px;border-radius:6px}
+footer{margin-top:12px;color:#94a3b8}
+button{background:#64748b;color:white;border:none;padding:8px 10px;border-radius:6px;cursor:pointer}
+```
+
+---
+
+## public/script.js
+
+```js
+import stationsData from '/stations.json' assert { type: 'json' };
+
+const stationListEl = document.getElementById('stationList');
+const statusEl = document.getElementById('status');
+const resultsEl = document.getElementById('results');
+const playPauseBtn = document.getElementById('playPause');
+const volumeEl = document.getElementById('volume');
+const validateAllBtn = document.getElementById('validateAll');
+const addCustomBtn = document.getElementById('addCustom');
+const audio = document.getElementById('audioPlayer');
+
+let stations = Array.isArray(stationsData) ? stationsData : [];
+let current = null;
+
+function proxyUrl(url){ return `/proxy?url=${encodeURIComponent(url)}`; }
+
+function renderStations(){
+  stationListEl.innerHTML = '';
+  for (const s of stations){
+    const li = document.createElement('li');
+    li.tabIndex = 0;
+    const title = document.createElement('div');
+    title.textContent = s.name;
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.textContent = `${s.country} — ${s.stream}`;
+    li.appendChild(title);
+    li.appendChild(meta);
+    li.addEventListener('click', ()=> selectStation(s, li));
+    stationListEl.appendChild(li);
+  }
+}
+
+function selectStation(s, li){
+  current = s;
+  document.querySelectorAll('#stationList li').forEach(n=>n.classList.remove('playing'));
+  li.classList.add('playing');
+  statusEl.textContent = `Sélection : ${s.name}`;
+  audio.src = proxyUrl(s.stream);
+  audio.play().then(()=> playPauseBtn.textContent = '⏸ Pause').catch(e=>{
+    statusEl.textContent = 'Impossible de lire le flux (vérifier le serveur proxy).';
+  });
+}
+
+playPauseBtn.addEventListener('click', ()=>{
+  if (!audio.src){ statusEl.textContent = "Sélectionnez une station d'abord."; return; }
+  if (audio.paused) audio.play().then(()=> playPauseBtn.textContent='⏸ Pause').catch(e=> statusEl.textContent='Lecture bloquée');
+  else { audio.pause(); playPauseBtn.textContent='▶️ Play'; }
+});
+
+volumeEl.addEventListener('input', ()=> audio.volume = Number(volumeEl.value));
+
+async function validateStream(url){
+  try{
+    const controller = new AbortController();
+    const id = setTimeout(()=>controller.abort(), 10000);
+    const res = await fetch(proxyUrl(url), { method: 'HEAD', signal: controller.signal });
+    clearTimeout(id);
+    return { ok: res && res.ok, status: res.status };
+  }catch(e){
+    return { ok:false, error: e.message };
+  }
+}
+
+async function validateAll(){
+  const lines = ['Validation en cours...'];
+  resultsEl.textContent = lines.join('
+');
+  for (const s of stations){
+    lines.push(`Testing ${s.name}...`);
+    resultsEl.textContent = lines.join('
+');
+    const r = await validateStream(s.stream);
+    lines.push(r.ok ? `OK (${r.status})` : `FAIL ${r.error || r.status}`);
+    resultsEl.textContent = lines.join('
+');
+  }
+  lines.push('Terminé');
+  resultsEl.textContent = lines.join('
+');
+}
+
+validateAllBtn.addEventListener('click', validateAll);
+
+addCustomBtn.addEventListener('click', ()=>{
+  const url = prompt('URL du flux (http/https)');
+  if (!url) return;
+  try{ new URL(url); }catch(e){ alert('URL invalide'); return; }
+  const custom = { id: Date.now(), name: 'Custom', country: '-', stream: url };
+  stations.unshift(custom);
+  renderStations();
+});
+
+renderStations();
+
+// expose for debugging
+window._radio = { stations };
+```
+
+---
+
+## Lancer le projet (local)
+
+1. Crée le dossier `radio-player` et colle les fichiers comme indiqué.
+2. `npm install`
+3. `npm start`
+4. Ouvre `http://localhost:3000`
+
+> Si un flux ne démarre pas : regarde la console du serveur (logs) et celle du navigateur. Le proxy lit le flux et le renvoie — si le flux distant coupe la connexion, le client peut afficher des erreurs.
+
+---
+
+## Déploiement
+
+- Tu peux déployer sur Render / Railway / Heroku. Assure-toi que le plan autorise le streaming de contenus.
+- Sur les plateformes serverless, piping de gros flux peut poser problème ; préfère un serveur Node classique.
+
+---
+
+Si tu veux, je peux :
+
+- Générer un `Dockerfile` et un `docker-compose.yml` pour un déploiement simple.
+- Ajouter une route d'administration pour gérer dynamiquement `stations.json` (CRUD).
+- Ajouter la liste complète de toutes tes stations (je peux injecter ton fichier initial dans `stations.json`).
+
+Dis-moi la prochaine étape que tu souhaites — j'ai tout préparé dans ce document.
