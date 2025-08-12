@@ -1,0 +1,33 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "frontend/dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/frontend/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/dist/$1"
+    }
+  ],
+  "functions": {
+    "frontend/api/*.js": {
+      "maxDuration": 10
+    }
+  },
+  "env": {
+    "VITE_API_URL": "https://eclairia-frontend.vercel.app",
+    "VITE_MAPBOX_TOKEN": "pk.eyJ1IjoiZWNsYWlyaWEiLCJhIjoiY2x4eHh4eHh4eHh4eHh4In0.example",
+    "VITE_SUPABASE_URL": "https://your-project.supabase.co",
+    "VITE_SUPABASE_KEY": "your_supabase_anon_key"
+  }
+} 
