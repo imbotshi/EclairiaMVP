@@ -19,11 +19,6 @@
       "dest": "/frontend/dist/$1"
     }
   ],
-  "functions": {
-    "frontend/api/*.js": {
-      "maxDuration": 10
-    }
-  },
   "env": {
     "VITE_API_URL": "https://eclairia-frontend.vercel.app",
     "VITE_MAPBOX_TOKEN": "pk.eyJ1IjoiZWNsYWlyaWEiLCJhIjoiY2x4eHh4eHh4eHh4eHh4In0.example",
