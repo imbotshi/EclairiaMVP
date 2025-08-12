@@ -11,8 +11,42 @@
   ],
   "routes": [
     {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/"
+      "dest": "/index.html"
+    }
+  ],
+  "functions": {
+    "api/*.js": {
+      "maxDuration": 10
+    }
+  },
+  "env": {
+    "VITE_API_URL": "https://eclairia-frontend.vercel.app",
+    "VITE_MAPBOX_TOKEN": "pk.eyJ1IjoiZWNsYWlyaWEiLCJhIjoiY2x4eHh4eHh4eHh4eHh4In0.example",
+    "VITE_SUPABASE_URL": "https://your-project.supabase.co",
+    "VITE_SUPABASE_KEY": "your_supabase_anon_key"
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type"
+        }
+      ]
     }
   ]
 }

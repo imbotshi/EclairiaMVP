@@ -1,0 +1,207 @@
+# PRD – Refactorisation, Optimisation des Performances & Nettoyage du Code
+
+**Version**: 1.0
+**Auteur**: ChatGPT (préparé pour exécution par Cursor AI)
+**Date**: 2025-08-12
+
+---
+
+## Contexte & Problème
+
+Lors de l’exécution de l’application sur un appareil mobile, l’usage CPU et GPU est anormalement élevé, entraînant une chauffe rapide du téléphone. Des audits préliminaires révèlent :
+
+* Des composants et processus qui s’exécutent en boucle inutilement.
+* Du code obsolète ou redondant encore présent dans la base.
+* Des appels API et traitements déclenchés alors qu’ils ne sont plus utilisés.
+
+Cela entraîne une surconsommation de ressources, une expérience utilisateur dégradée et une maintenance difficile.
+
+---
+
+## Objectifs
+
+* Réduire la charge CPU et GPU pendant l’exécution.
+* Supprimer le code inutilisé sans affecter le comportement actuel.
+* Améliorer la lisibilité, la maintenabilité et la stabilité du code.
+* Garantir la fluidité et la stabilité de l’application sur mobile.
+* Prévenir la chauffe excessive de l’appareil lors d’une utilisation normale.
+
+---
+
+## Périmètre
+
+**Inclus :**
+
+* Audit complet du code pour identifier les sections inutilisées.
+* Refactorisation et optimisation des composants à forte charge.
+* Nettoyage (code pruning) en respectant la compatibilité avec les fonctionnalités actuelles.
+* Optimisation des rendus, animations et appels API.
+* Mise en place de tests pour vérifier qu’aucune fonctionnalité n’est cassée.
+
+**Exclus :**
+
+* Refonte graphique ou ajout de nouvelles fonctionnalités.
+* Migration vers une autre technologie.
+
+---
+
+## Livrables attendus
+
+1. Rapport d'audit détaillé (liste de composants, fonctions, dépendances suspectes).
+2. Branches de refactorisation par module / par composant (commits atomiques).
+3. Tests unitaires et d’intégration mis à jour.
+4. Bundle optimisé (rapport avant/après taille et dépendances).
+5. Documentation et guide de maintenance (README mis à jour).
+6. Rapport de performance (CPU/GPU, temps de rendu, température appareil).
+
+---
+
+## Fonctionnalités & Contraintes techniques
+
+### Rendu optimisé
+
+* Limiter les re-renders aux changements pertinents.
+* Éliminer les timers, watchers et effets superflus.
+* Appliquer `memoization` et `shouldComponentUpdate` / `computed` optimisés selon le framework.
+
+### Code nettoyé et allégé
+
+* Supprimer le code mort (fonctions, imports, variables jamais utilisées).
+* Éliminer les doublons et fonctions redondantes.
+* Retirer les dépendances npm/yarn non utilisées après vérification.
+* Nettoyer les logs de debug permanents.
+* Mettre à jour la documentation pour refléter l’état réel du projet.
+
+### Chargement contrôlé
+
+* Mettre en place lazy-loading et code-splitting.
+* Charger différé (defer) les assets lourds (images, vidéos, polices non critiques).
+
+### Gestion des données
+
+* Mise en cache des résultats API et invalidation contrôlée.
+* Détecter et corriger les appels API en boucle.
+
+### Optimisation visuelle
+
+* Utiliser `requestAnimationFrame` pour les animations personnalisées.
+* Préférer des librairies d’animation performantes et optimisées mobile.
+* Compresser et optimiser les images et SVGs.
+
+### Surveillance & Diagnostics
+
+* Intégrer un profiling continu (React Profiler / Vue Devtools / Lighthouse / perf monitors).
+* Logger métriques clés (temps de rendu, FPS, consommation CPU approximative, erreurs JS).
+
+---
+
+## Critères de réussite (KPIs)
+
+* Temps moyen de rendu réduit d’au moins **30%**.
+* CPU moyen < **30%** en usage normal.
+* Taille du bundle final réduite d’au moins **20%**.
+* Aucun test unitaire ou d’intégration cassé après nettoyage.
+* Temps de chargement initial < **2s** sur téléphone milieu de gamme.
+* Température stabilisée (< **38°C** après 10 min d’utilisation continue).
+
+---
+
+## Plan d’action détaillé (Workflow)
+
+### 1. Audit & Cartographie (Jours 1–3)
+
+* Lancer le profiler sur plusieurs scénarios d’usage.
+* Produire une carte des composants gourmands et des appels répétitifs.
+* Lister le code potentiellement mort et les dépendances suspectes.
+
+**Deliverable**: Rapport d’audit + checklist de composants prioritaires.
+
+### 2. Refactorisation ciblée (Jours 4–10)
+
+* Prioriser composants par impact (CPU, re-renders, poids bundle).
+* Refactoriser en petites PRs atomiques (un composant / module par PR).
+* Introduire memoization, hooks optimisés et patterns de rendu paresseux.
+
+**Deliverable**: PRs nommées et révisées, tests unitaires ajoutés.
+
+### 3. Nettoyage sécurisé (Jours 11–14)
+
+* Supprimer le code mort en commits séparés et réversibles.
+* Retirer dépendances après validation locale et CI.
+* Rebase et cleanup de l’historique si nécessaire.
+
+**Deliverable**: Branch `pruning/clean-code` avec liste des suppressions.
+
+### 4. Optimisations globales (Jours 15–18)
+
+* Implémenter lazy-loading, code splitting et compression des assets.
+* Mettre en place cache côté client et invalidation.
+
+**Deliverable**: Build optimisée et rapport de réduction de bundle.
+
+### 5. Tests & Validation (Jours 19–22)
+
+* Tests automatisés (CI) et tests manuels sur plusieurs appareils.
+* Comparaison des métriques avant/après.
+
+**Deliverable**: Rapport de perf, capture de profiles, tests verts.
+
+### 6. Déploiement & Monitoring (Jours 23–25)
+
+* Déploiement contrôlé (canary / progressive).
+* Monitoring post-release et plan de rollback.
+
+**Deliverable**: Release notes et dashboards de monitoring.
+
+---
+
+## Stratégie de suppression du code (Safe Pruning)
+
+1. **Identification**: marquer le code suspect comme `// TODO: dead-code?` et ajouter une issue correspondante.
+2. **Tests**: écrire tests d’interface (smoke tests) autour des zones critiques.
+3. **Feature Flags**: si applicable, encapsuler la suppression derrière un flag désactivable.
+4. **Commits atomiques**: chaque suppression doit être une PR séparée, simple à reviewer et à revert.
+5. **Validation CI**: pipelines exécutant tests unitaires, linting, et tests E2E minimalistes.
+6. **Déploiement progressif**: monitorer erreurs/metrics pendant le rollout.
+
+---
+
+## Risques & Atténuations
+
+* **Suppression accidentelle de code utile** → PRs atomiques, tests et revues.
+* **Réduction de performance insuffisante** → itérations supplémentaires ciblées et profiling plus fin.
+* **Régressions UX** → smoke tests et recap visuel avant release.
+
+---
+
+## Checklist opérationnelle (à copier en tâches pour Cursor)
+
+* [ ] Lancer profiling scénarios A, B, C.
+* [ ] Produire la liste des composants à haute consommation.
+* [ ] Ajouter tests unitaires pour zones critiques.
+* [ ] Refactoriser composant X (ex : `AudioPlayer`) — PR #.
+* [ ] Supprimer code mort : fichiers listés.
+* [ ] Retirer dépendances non utilisées (vérifier `package.json`).
+* [ ] Mettre en place lazy-loading pour routes non critiques.
+* [ ] Optimiser images et assets lourds.
+* [ ] Lancer pipeline CI et tests E2E légers.
+* [ ] Mesurer et documenter les gains.
+
+---
+
+## Notes pour Cursor AI
+
+* Génère des PRs atomiques et nommés pour chaque changement.
+* Joins à chaque PR : description, files changed, tests ajoutés, et capture de profiling avant/après.
+* Pour chaque suppression de dépendance : vérifier impact transitive et exécuter full test suite.
+
+---
+
+## Annexes
+
+* Exemples de patterns à rechercher : setInterval non clear, listeners non détachés, subscriptions non nettoyées, loops de state updates, images non optimisées, import dynamique manquant.
+* Outils recommandés : React Profiler / Vue Devtools, Lighthouse, Sentry (monitoring), bundle-buddy / webpack-bundle-analyzer.
+
+---
+
+*Fin du document.*

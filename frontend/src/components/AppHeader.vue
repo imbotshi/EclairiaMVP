@@ -106,21 +106,21 @@ function closeReportModal() {
 
 function handleSupport() {
   // Logique pour traiter le soutien de 5000 XAF
-  console.log('Soutien de 5000 XAF demandé')
+  // Suppression du console.log pour la production
   // Ici on pourrait intégrer un système de paiement
   closeSupportModal()
 }
 
 function handleReport(reportData) {
   // Logique pour traiter le signalement
-  console.log('Signalement reçu:', reportData)
+  // Suppression du console.log pour la production
   // Ici on pourrait envoyer le signalement à la base de données
   closeReportModal()
 }
 
 function handleTabChange(tab) {
   currentTab.value = tab
-  console.log('Onglet actif:', tab)
+  // Suppression du console.log pour la production
   // Émettre un événement pour informer le composant parent du changement d'onglet
   emit('tab-change', tab)
 }

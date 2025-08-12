@@ -46,12 +46,10 @@ const handlePointerUp = () => {
 }
 
 const handleImageError = (event) => {
-  console.error('Erreur de chargement du logo:', event.target.src)
-}
+  }
 
 const handleImageLoad = () => {
-  console.log('Logo chargé avec succès')
-}
+  }
 
 onMounted(() => {
   // Animation d'apparition après 600ms

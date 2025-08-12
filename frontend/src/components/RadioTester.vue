@@ -146,8 +146,7 @@ async function runTests() {
     lastTestTime.value = new Date().toLocaleTimeString()
     
   } catch (error) {
-    console.error('Erreur lors du test des stations:', error)
-  } finally {
+    } finally {
     isTesting.value = false
   }
 }

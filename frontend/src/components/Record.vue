@@ -288,7 +288,6 @@ async function initWaveSurfer() {
 
   // Record events
   record.on('record-start', () => {
-    console.log('Recording started')
     isRecording.value = true
     recordingState.value = 'recording'
     currentTime.value = 0
@@ -298,7 +297,6 @@ async function initWaveSurfer() {
   })
 
   record.on('record-end', (blob) => {
-    console.log('Recording ended', blob)
     isRecording.value = false
     recordingState.value = 'finished'
     hasRecording.value = true
@@ -348,7 +346,6 @@ async function toggleRecording() {
       await record.startRecording()
     }
   } catch (error) {
-    console.error('Recording error:', error)
     showError.value = true
     errorMessage.value = 'Erreur d\'accès au microphone. Veuillez autoriser l\'accès.'
   }
@@ -410,7 +407,6 @@ async function shareRecording() {
     
     showToast('Enregistrement partagé avec succès ! Votre voix est maintenant disponible pour la communauté.', 'success')
   } catch (error) {
-    console.error('Share error:', error)
     showToast('Erreur lors du partage. Veuillez réessayer dans quelques instants.', 'error')
   }
 }

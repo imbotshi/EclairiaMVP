@@ -1,238 +1,108 @@
-# 🎵 Eclairia - Application Audio Moderne
+# Eclairia - Plateforme audio interactive
 
-Une application audio révolutionnaire combinant cartographie vocale, podcasts et expérience utilisateur moderne inspirée des meilleures applications de 2025.
+Plateforme audio interactive avec radio intégrée, enregistrement vocal et interface 3D.
 
-## ✨ Fonctionnalités Principales
+## 🚀 Technologies
 
-### 🗺️ Onglet Voice - Cartographie Vocale Avancée
-- **Carte interactive** avec design sombre moderne
-- **Géolocalisation en temps réel** avec Leaflet et OpenStreetMap
-- **Interface glassmorphism** avec contrôles intuitifs
-- **Marqueurs vocaux** positionnés géographiquement
-- **Panneau de contrôle** avec boutons de localisation et zoom
-- **Design responsive** adapté à tous les écrans
+- **Frontend**: Vue 3 + Vite + Tailwind CSS + Three.js + Wavesurfer.js
+- **Backend**: Node.js + Express (proxy audio et API stations)
+- **Base de données**: Supabase
+- **Déploiement**: Vercel (frontend statique)
 
-### 🎧 Onglet Podcast - Expérience Spotify-like
-- **Design minimaliste** avec hiérarchie claire
-- **Carrousel horizontal** pour les catégories
-- **Scroll fluide** sans effet parallax
-- **Mini-player** intégré avec contrôles avancés
-- **Mode conduite** pour une expérience sécurisée
-- **Détection de gestes** (swipe, shake)
+## 📦 Installation
 
-### 🎨 Design System Eclairia
-- **Palette de couleurs** cohérente et moderne
-- **Typographie** optimisée (ABC Whyte, Figtree)
-- **Animations fluides** et naturelles
-- **Glassmorphism** pour un effet premium
-- **Responsive design** mobile-first
-
-## 🚀 Technologies Utilisées
-
-### Frontend
-- **Vue.js 3** - Framework moderne et réactif
-- **Vite** - Build tool ultra-rapide
-- **Tailwind CSS** - Framework CSS utilitaire
-- **Leaflet.js** - Cartographie interactive
-- **OpenStreetMap** - Tiles de carte gratuits
-
-### Backend
-- **Node.js** - Runtime JavaScript
-- **Express.js** - Framework web
-- **Supabase** - Base de données et authentification
-
-### Outils de Développement
-- **Git** - Version control
-- **GitHub** - Repository et collaboration
-- **Vercel** - Déploiement et hosting
-
-## 📱 Installation et Démarrage
-
-### Prérequis
-- Node.js 18+ 
-- npm ou yarn
-- Git
-
-### Installation
-
-1. **Cloner le repository**
 ```bash
-git clone https://github.com/imbotshi/EclairiaMVP.git
-cd EclairiaMVP
-```
-
-2. **Installer les dépendances**
-```bash
-# Backend
+# Installer les dépendances backend
 npm install
 
-# Frontend
+# Installer les dépendances frontend
 cd frontend
 npm install
 ```
 
-3. **Configuration des variables d'environnement**
-```bash
-# Dans le dossier frontend
-cp env.example .env
-# Éditer .env avec vos clés API
-```
+## 🛠️ Développement
 
-4. **Démarrer les serveurs**
+### Option 1: Backend + Frontend séparés (recommandé)
 ```bash
 # Terminal 1 - Backend (port 3001)
+npm run dev:server
+
+# Terminal 2 - Frontend (port 3000)
+npm run dev:client
+```
+
+### Option 2: Backend seulement
+```bash
 npm run dev
-
-# Terminal 2 - Frontend (port 3002)
-cd frontend
-npm run dev
 ```
 
-5. **Accéder à l'application**
-- Frontend: http://localhost:3002
-- Backend: http://localhost:3001
+## 🌐 URLs de développement
 
-## 🌐 Déploiement
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:3001
+  - `/proxy?url=...` - Proxy audio
+  - `/api/stations` - Liste des stations radio
+  - `/health` - Health check
 
-### Vercel (Recommandé)
-1. Connectez votre repository GitHub à Vercel
-2. Le déploiement se fait automatiquement à chaque push
-3. Configuration incluse dans `vercel.json`
+## 🚀 Déploiement
 
-### Autres Plateformes
-- **Netlify** - Compatible avec la configuration Vite
-- **GitHub Pages** - Déploiement statique
-- **AWS S3 + CloudFront** - Solution enterprise
-
-## 🎯 Architecture du Projet
-
-```
-Eclairia/
-├── frontend/                 # Application Vue.js
-│   ├── src/
-│   │   ├── components/      # Composants Vue
-│   │   ├── composables/     # Logique réutilisable
-│   │   ├── services/        # Services API
-│   │   ├── utils/           # Utilitaires
-│   │   └── config/          # Configuration
-│   ├── public/              # Assets statiques
-│   └── package.json
-├── server.js                # Serveur Express
-├── vercel.json             # Configuration Vercel
-└── README.md
-```
-
-## 🔧 Composants Clés
-
-### VoiceMapOpenStreet.vue
-- Carte interactive avec Leaflet
-- Géolocalisation en temps réel
-- Interface glassmorphism
-- Contrôles de navigation
-
-### PodcastTab.vue
-- Design minimaliste Spotify-like
-- Carrousel horizontal fluide
-- Mini-player intégré
-- Détection de gestes
-
-### Home.vue
-- Navigation entre onglets
-- Gestion de l'état global
-- Intégration des composants
-
-## 🎨 Design System
-
-### Couleurs
-- `eclairia-dark`: #0F0F0F
-- `eclairia-blue`: #3B82F6
-- `eclairia-pink`: #EC4899
-- `eclairia-purple`: #8B5CF6
-- `eclairia-green`: #10B981
-
-### Typographie
-- **ABC Whyte** - Titres et headings
-- **Figtree** - Corps de texte et UI
-
-### Animations
-- Transitions CSS fluides
-- Hover effects subtils
-- Micro-interactions
-- Responsive breakpoints
-
-## 📱 Responsive Design
-
-- **Mobile First** - Optimisé pour mobile
-- **Tablet** - Adaptation pour écrans moyens
-- **Desktop** - Expérience complète
-- **Touch-friendly** - Gestes tactiles optimisés
-
-## 🔒 Sécurité
-
-- Validation des entrées utilisateur
-- Protection CSRF
-- Headers de sécurité
-- Variables d'environnement sécurisées
-
-## 🧪 Tests
+Le projet est configuré pour un déploiement statique sur Vercel :
 
 ```bash
-# Tests unitaires
-npm run test:unit
+# Build de production
+npm run build
 
-# Tests d'intégration
-npm run test:integration
-
-# Tests E2E
-npm run test:e2e
+# Preview locale
+cd frontend
+npm run preview
 ```
 
-## 📊 Performance
+## 📁 Structure
 
-- **Lazy loading** des composants
-- **Code splitting** automatique
-- **Optimisation des images**
-- **Cache intelligent**
-- **Bundle analysis** intégré
+```
+├── server.js              # API backend (proxy + stations)
+├── package.json           # Dépendances backend
+├── frontend/              # Application Vue/Vite
+│   ├── src/
+│   │   ├── components/    # Composants Vue
+│   │   ├── services/      # Services API
+│   │   ├── composables/   # Composables Vue
+│   │   └── router/        # Configuration router
+│   ├── public/
+│   │   └── api/           # Données statiques (stations.json)
+│   └── package.json       # Dépendances frontend
+└── vercel.json           # Configuration déploiement Vercel
+```
 
-## 🤝 Contribution
+## 🔧 Configuration
 
-1. Fork le projet
-2. Créer une branche feature (`git checkout -b feature/AmazingFeature`)
-3. Commit les changements (`git commit -m 'Add some AmazingFeature'`)
-4. Push vers la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrir une Pull Request
+### Variables d'environnement (frontend)
 
-## 📝 Changelog
+Créer un fichier `.env` dans `frontend/` :
 
-### v1.0.0 (2025-01-XX)
-- ✨ Implémentation complète des onglets Voice et Podcast
-- 🗺️ Cartographie vocale avec Leaflet et OpenStreetMap
-- 🎧 Interface podcast design Spotify-like
-- 🎨 Design system Eclairia complet
-- 📱 Interface responsive mobile-first
-- 🚀 Configuration Vercel pour déploiement
+```env
+VITE_SUPABASE_URL=votre_url_supabase
+VITE_SUPABASE_ANON_KEY=votre_clé_anon_supabase
+```
 
-## 📄 Licence
+## 🎵 Fonctionnalités
 
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+- **Radio en ligne** : Écoute de stations radio via proxy
+- **Enregistrement vocal** : Capture audio avec interface dédiée
+- **Sphère 3D** : Interface interactive avec Three.js
+- **Lecteur audio** : Contrôles de lecture avancés
+- **Onboarding** : Guide utilisateur intégré
 
-## 🙏 Remerciements
+## 🐛 Dépannage
 
-- **Leaflet.js** - Cartographie interactive
-- **Vue.js** - Framework frontend
-- **Tailwind CSS** - Framework CSS
-- **OpenStreetMap** - Données cartographiques
-- **Vercel** - Plateforme de déploiement
+### Problèmes de ports
+- Vérifier que les ports 3000 et 3001 sont libres
+- Modifier les ports dans `frontend/vite.config.js` et `server.js` si nécessaire
 
-## 📞 Support
+### Problèmes de proxy audio
+- Vérifier l'allowlist dans `server.js`
+- Contrôler les logs du serveur pour les erreurs de connexion
 
-- **Issues GitHub**: [Signaler un bug](https://github.com/imbotshi/EclairiaMVP/issues)
-- **Discussions**: [Forum communautaire](https://github.com/imbotshi/EclairiaMVP/discussions)
-- **Email**: [Contact support](mailto:support@eclairia.com)
-
----
-
-**Développé avec ❤️ par l'équipe Eclairia**
-
-*Révolutionnez votre expérience audio avec la cartographie vocale moderne* 
+### Build échoue
+- Vérifier que toutes les dépendances sont installées
+- Nettoyer `node_modules` et réinstaller si nécessaire 

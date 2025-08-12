@@ -34,24 +34,20 @@ const updateBarPosition = () => {
   const buttons = document.querySelectorAll(".tab-button");
   const activeBtn = Array.from(buttons).find(btn => btn.textContent.trim() === activeTab.value);
   
-  // Debug: afficher les positions de tous les boutons
-  console.log('🔍 Positions des boutons:');
-  buttons.forEach((btn, index) => {
-    console.log(`  ${index}: "${btn.textContent.trim()}" - offsetLeft: ${btn.offsetLeft}px, width: ${btn.offsetWidth}px`);
-  });
+  // Suppression des console.log de debug pour la production
   
   if (activeBtn) {
     tabWidth.value = activeBtn.offsetWidth;
     tabOffset.value = activeBtn.offsetLeft;
     
-    console.log(`🎯 Tab "${activeTab.value}": width=${tabWidth.value}px, offset=${tabOffset.value}px`);
+    // Suppression du console.log de debug
   } else {
-    console.warn(`⚠️ Bouton actif non trouvé pour l'onglet: ${activeTab.value}`);
+    // Suppression du console.warn pour la production
   }
 };
 
 const handleTabClick = (tab) => {
-  console.log(`🖱️ Clic sur l'onglet: ${tab}`);
+  // Suppression du console.log de debug
   activeTab.value = tab;
   // Émettre un événement pour informer le parent du changement d'onglet
   emit('tab-change', tab);

@@ -21,7 +21,7 @@ onMounted(async () => {
       const playPromise = backgroundMusic.value.play()
       if (playPromise !== undefined) {
         playPromise.catch(error => {
-          console.warn('Lecture automatique empêchée:', error)
+          // Suppression du console.warn pour la production
           // Ajouter un gestionnaire de clic pour démarrer la lecture
           document.addEventListener('click', () => {
             backgroundMusic.value.play()
@@ -29,7 +29,7 @@ onMounted(async () => {
         })
       }
     } catch (error) {
-      console.error('Erreur de chargement audio:', error)
+      // Suppression du console.error pour la production
     }
   }
 })
@@ -47,19 +47,33 @@ const showRecordModal = ref(false)
 const showOnboarding = ref(false)
 const onboardingStep = ref(1)
 
+// Timer pour le splash screen - avec cleanup
+let splashTimer = null
+let onboardingTimer = null
+
 onMounted(() => {
   // Show splash for 10 seconds
-  setTimeout(() => {
+  splashTimer = setTimeout(() => {
     currentView.value = 'home'
     
     // Check if first visit
     const hasVisited = localStorage.getItem('eclairia-visited')
     if (!hasVisited) {
-      setTimeout(() => {
+      onboardingTimer = setTimeout(() => {
         showOnboarding.value = true
       }, 500)
     }
   }, 10000)
+})
+
+onUnmounted(() => {
+  // Cleanup des timers
+  if (splashTimer) {
+    clearTimeout(splashTimer)
+  }
+  if (onboardingTimer) {
+    clearTimeout(onboardingTimer)
+  }
 })
 
 function openRecordModal() {
@@ -85,7 +99,7 @@ function closeOnboarding() {
 
 <template>
   <div id="app">
-    <router-view />
+    <router-view @open-record="openRecordModal" />
     
     <!-- SplashScreen -->
     <SplashScreen v-if="currentView === 'splash'" />

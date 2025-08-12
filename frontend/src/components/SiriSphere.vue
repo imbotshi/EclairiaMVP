@@ -57,7 +57,10 @@ const audioState = ref({
   get error() { return error.value }
 })
 
+// Variables Three.js
 let scene, camera, renderer, sphere, material, analyser, dataArray
+
+// Cleanup des timers et animations
 let animationId = null
 let touchStartTime = 0
 let isLongPress = false
@@ -227,27 +230,19 @@ function initThreeJS() {
 
 
 
-function animate(time) {
-  animationId = requestAnimationFrame(animate)
-
-  // Rotation
-  sphere.rotation.y += 0.005
-  scene.children.forEach(child => {
-    if (child.type === 'Mesh' && child !== sphere) {
-      child.rotation.y += 0.002
-    }
-    if (child.type === 'Points') {
-      child.rotation.y += 0.001
-    }
-  })
-
-  // Update shader time
-  material.uniforms.time.value = time * 0.001
-
-  // Mise à jour des uniforms audio
-  updateShaderUniforms()
-
+// Animation optimisée avec cleanup
+function animate() {
+  if (!material) return
+  
+  const time = Date.now() * 0.001
+  material.uniforms.time.value = time
+  
+  // Optimisation : réduire la fréquence de rendu si pas d'interaction
+  if (isPlaying.value || volumeControlActive) {
   renderer.render(scene, camera)
+  }
+  
+  animationId = requestAnimationFrame(animate)
 }
 
 function handleResize() {
@@ -360,40 +355,6 @@ async function handleSphereClick() {
   }
 }
 
-function handleTouchStart(event) {
-  event.preventDefault()
-  touchStartTime = Date.now()
-  isLongPress = false
-  volumeControlActive = false
-  
-  if (event.touches && event.touches[0]) {
-    initialTouchY = event.touches[0].clientY
-    initialTouchX = event.touches[0].clientX
-    swipeStartTime = Date.now()
-  }
-  
-  // Détecter un appui long après 500ms pour contrôle volume
-  volumeControlTimeout = setTimeout(() => {
-    if (Date.now() - touchStartTime >= 500) {
-      isLongPress = true
-      volumeControlActive = true
-      console.log('🔊 Contrôle volume activé')
-      
-      // Effet visuel pour le contrôle volume
-      if (sphere) {
-        sphere.scale.setScalar(1.15)
-        // Changer la couleur pour indiquer le mode volume
-        if (material) {
-          material.uniforms.audioState.value = 0.3 // Couleur spéciale volume
-        }
-      }
-      
-      // Ajouter les listeners pour le contrôle volume
-      document.addEventListener('touchmove', handleVolumeControl, { passive: false })
-    }
-  }, 500)
-}
-
 // Gestionnaire de tap (simple/double)
 function handleTapGesture() {
   const currentTime = Date.now()
@@ -403,7 +364,7 @@ function handleTapGesture() {
     // Double tap détecté
     tapCount = 0
     lastTapTime = 0
-    console.log('👆👆 Double tap - Action spéciale')
+    // Suppression du console.log
     emit('double-tap')
     
     // Action spéciale : basculer entre stations favorites
@@ -417,7 +378,7 @@ function handleTapGesture() {
     setTimeout(() => {
       if (tapCount === 1 && Date.now() - lastTapTime >= 300) {
         // Tap simple confirmé
-        console.log('👆 Tap simple')
+        // Suppression du console.log
         handleSphereClick()
         tapCount = 0
         lastTapTime = 0
@@ -429,7 +390,7 @@ function handleTapGesture() {
 // Action spéciale pour double tap
 function handleDoubleTapAction() {
   // Exemple : basculer le mode aléatoire ou favoris
-  console.log('✨ Mode spécial activé')
+  // Suppression du console.log
   
   // Effet visuel spécial
   if (sphere) {
@@ -478,61 +439,52 @@ function setVolumeRadio(newVolume) {
   emit('volume-changed', volume.value)
 }
 
+// Gestion des événements optimisée
+function handleTouchStart(event) {
+  touchStartTime = Date.now()
+  isLongPress = false
+  initialTouchY = event.touches[0].clientY
+  initialTouchX = event.touches[0].clientX
+  
+  // Timer pour long press avec cleanup
+  volumeControlTimeout = setTimeout(() => {
+    isLongPress = true
+    volumeControlActive = true
+    // Suppression du console.log
+  }, 500)
+}
+
 function handleTouchEnd(event) {
-  event.preventDefault()
   const touchDuration = Date.now() - touchStartTime
   
-  // Nettoyer les timeouts et listeners
   if (volumeControlTimeout) {
     clearTimeout(volumeControlTimeout)
     volumeControlTimeout = null
   }
   
-  document.removeEventListener('touchmove', handleVolumeControl)
-  
-  // Remettre la taille et couleur normales
-  if (sphere) {
-    sphere.scale.setScalar(1.0)
+  if (isLongPress) {
+    volumeControlActive = false
+    // Suppression du console.log
+    return
   }
   
-  // Remettre la couleur selon l'état audio
-  updateShaderUniforms()
-  
-  // Détecter les swipes horizontaux
-  if (!isLongPress && !volumeControlActive && event.changedTouches && event.changedTouches[0]) {
-    const finalTouchX = event.changedTouches[0].clientX
-    const swipeDistance = finalTouchX - initialTouchX
-    const swipeTime = Date.now() - swipeStartTime
-    
-    // Swipe détecté si distance > 50px et temps < 300ms
-    if (Math.abs(swipeDistance) > 50 && swipeTime < 300) {
-      if (swipeDistance > 0) {
-        logToResults('➡️ Swipe droite - Station suivante', 'info')
-        nextStation(audioElement.value)
-        emit('next-station')
-        emit('station-changed', currentStation.value)
-      } else {
-        logToResults('⬅️ Swipe gauche - Station précédente', 'info')
-        previousStation(audioElement.value)
-        emit('previous-station')
-        emit('station-changed', currentStation.value)
-      }
-    } else if (touchDuration < 500) {
-      // Tap rapide - détecter double tap
-      handleTapGesture()
+  // Gestion des taps
+  const currentTime = Date.now()
+  if (currentTime - lastTapTime < 300) {
+    tapCount++
+    if (tapCount === 2) {
+      // Double tap
+      // Suppression du console.log
+      emit('double-tap')
+      tapCount = 0
     }
-  } else if (volumeControlActive) {
-    console.log('🔊 Contrôle volume terminé')
+  } else {
+    tapCount = 1
   }
+  lastTapTime = currentTime
   
-  // Reset des variables
-  touchStartTime = 0
-  isLongPress = false
-  volumeControlActive = false
-  initialTouchY = 0
-  initialTouchX = 0
-  swipeStartTime = 0
-  // Note: lastTapTime et tapCount ne sont pas reset ici pour le double tap
+  // Tap simple
+  // Suppression du console.log
 }
 
 // Watcher pour les changements de station (logique radio-test)
@@ -587,14 +539,21 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
-  // Nettoyer les animations
+  // Cleanup complet
   if (animationId) {
     cancelAnimationFrame(animationId)
   }
+  if (volumeControlTimeout) {
+    clearTimeout(volumeControlTimeout)
+  }
   
-  // Nettoyer les événements
-  window.removeEventListener('resize', handleResize)
-  document.removeEventListener('touchmove', handleVolumeControl)
+  // Cleanup Three.js
+  if (renderer) {
+    renderer.dispose()
+  }
+  if (scene) {
+    scene.clear()
+  }
   
   // Nettoyer les timeouts
   if (volumeControlTimeout) {

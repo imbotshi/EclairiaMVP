@@ -25,7 +25,6 @@ export function useRadio() {
     const timestamp = new Date().toLocaleTimeString()
     const prefix = type === 'success' ? '✅' : type === 'error' ? '❌' : '🔍'
     const line = `[${timestamp}] ${prefix} ${message}`
-    console.log(line)
     return line
   }
 
